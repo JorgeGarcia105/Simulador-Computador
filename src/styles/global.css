@@ -1,0 +1,290 @@
+/* Estilos base */
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+}
+
+.computer-simulator {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Panel de control */
+.control-panel {
+  background: #333;
+  color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.control-panel button {
+  padding: 8px 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.control-panel button:hover {
+  background: #45a049;
+}
+
+/* Componentes del computador */
+.computer-components {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Estilos para CPU */
+.cpu {
+  background: #e9f7ef;
+  padding: 15px;
+  border-radius: 5px;
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+}
+
+.alu, .registers, .control-unit {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Estilos para registros */
+.registers table {
+  width: 100%;
+}
+
+.registers td {
+  padding: 5px 0;
+}
+
+.hex-value {
+  color: #2196F3;
+  font-weight: bold;
+}
+
+.dec-value {
+  color: #777;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+/* Estilos para ALU */
+.alu-operations {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.alu-btn {
+  padding: 5px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Unidad de control */
+.signal {
+  padding: 8px;
+  margin: 5px 0;
+  background: #ddd;
+  border-radius: 3px;
+}
+
+.signal.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.micro-operations ul {
+  padding-left: 20px;
+}
+
+.micro-operations li {
+  margin: 5px 0;
+}
+
+/* Estilos para Memoria */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.memory-cell {
+  border: 1px solid #ddd;
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  background: white;
+}
+
+.memory-cell.active {
+  border-color: #2196F3;
+  background: #e3f2fd;
+}
+
+.memory-cell .address {
+  font-size: 0.7em;
+  color: #666;
+}
+
+.memory-cell .memory-value {
+  margin-top: 3px;
+  font-weight: bold;
+}
+
+.memory-cell input.memory-value {
+  width: 100%;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+}
+
+/* Estilos para Buses */
+.bus {
+  padding: 10px;
+  margin: 10px 0;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.bus.active {
+  background: #fff8e1;
+}
+
+.bus h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.bus-value {
+  font-family: monospace;
+  font-size: 1.2em;
+  padding: 5px;
+  background: white;
+  border-radius: 3px;
+}
+
+.bus-animation {
+  height: 3px;
+  background: #ddd;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bus.active .bus-animation::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 100%;
+  background: #4CAF50;
+  animation: busFlow 1.5s infinite linear;
+}
+
+@keyframes busFlow {
+  0% { left: -30%; }
+  100% { left: 100%; }
+}
+
+/* Estilos para E/S */
+.io-component {
+  padding: 15px;
+  background: white;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.keyboard input {
+  padding: 8px;
+  width: 70%;
+  margin-right: 5px;
+}
+
+.keyboard button {
+  padding: 8px 15px;
+}
+
+.screen-output {
+  min-height: 50px;
+  padding: 10px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+.placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Estilos para Disco */
+.disk-component {
+  padding: 15px;
+  background: white;
+  border-radius: 5px;
+}
+
+.disk-controls {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.disk-controls input {
+  width: 60px;
+  padding: 5px;
+}
+
+.disk-controls button {
+  padding: 5px 10px;
+}
+
+.sector-data {
+  padding: 10px;
+  background: #f5f5f5;
+  margin-top: 5px;
+  font-family: monospace;
+}
+
+/* Conjunto de instrucciones */
+.instruction-set {
+  grid-column: span 2;
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.instruction-set table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.instruction-set th, 
+.instruction-set td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.instruction-set th {
+  background-color: #f2f2f2;
+}
