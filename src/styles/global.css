@@ -19,17 +19,19 @@ body {
   margin-bottom: 20px;
   border-radius: 5px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .control-panel button {
-  padding: 8px 15px;
+  padding: 8px 20px;
   background: #4CAF50;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 .control-panel button:hover {
@@ -39,7 +41,7 @@ body {
 /* Componentes del computador */
 .computer-components {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
@@ -58,7 +60,7 @@ body {
   background: white;
   padding: 15px;
   border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos para registros */
@@ -85,17 +87,22 @@ body {
 .alu-operations {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 10px;
   margin-top: 10px;
 }
 
 .alu-btn {
-  padding: 5px;
+  padding: 8px;
   background: #2196F3;
   color: white;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.alu-btn:hover {
+  background: #1976d2;
 }
 
 /* Unidad de control */
@@ -103,7 +110,8 @@ body {
   padding: 8px;
   margin: 5px 0;
   background: #ddd;
-  border-radius: 3px;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s;
 }
 
 .signal.active {
@@ -129,10 +137,12 @@ body {
 
 .memory-cell {
   border: 1px solid #ddd;
-  padding: 5px;
+  padding: 10px;
   text-align: center;
   cursor: pointer;
   background: white;
+  border-radius: 5px;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .memory-cell.active {
@@ -146,7 +156,7 @@ body {
 }
 
 .memory-cell .memory-value {
-  margin-top: 3px;
+  margin-top: 5px;
   font-weight: bold;
 }
 
@@ -160,10 +170,11 @@ body {
 
 /* Estilos para Buses */
 .bus {
-  padding: 10px;
+  padding: 15px;
   margin: 10px 0;
   background: #f5f5f5;
   border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .bus.active {
@@ -180,11 +191,11 @@ body {
   font-size: 1.2em;
   padding: 5px;
   background: white;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .bus-animation {
-  height: 3px;
+  height: 4px;
   background: #ddd;
   margin-top: 10px;
   position: relative;
@@ -245,7 +256,7 @@ body {
 
 .disk-controls {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   margin: 10px 0;
 }
 
@@ -271,6 +282,7 @@ body {
   background: white;
   padding: 15px;
   border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .instruction-set table {
@@ -287,4 +299,41 @@ body {
 
 .instruction-set th {
   background-color: #f2f2f2;
+}
+
+.instruction-set tr:hover {
+  background-color: #f1f1f1;
+}
+
+.instruction-set .opcode {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.instruction-set .description {
+  color: #555;
+}
+
+/* Estilos para el botón de reinicio */
+.reset-button {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.reset-button:hover {
+  background: #e53935;
+}
+
+.memory-section {
+  overflow-y: auto;
+  max-height: 800px;
+}
+
+.memory-section, .cpu-section {
+  min-width: 800px;
 }

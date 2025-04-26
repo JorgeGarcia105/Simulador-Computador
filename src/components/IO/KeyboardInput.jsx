@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const KeyboardInput = ({ onInput, onProgramSubmit }) => {
+const KeyboardInput = ({ onInput, onProgramSubmit, onSaveToMemory, onMemoryRead }) => {
   const [inputValue, setInputValue] = useState('');
-  const [inputMode, setInputMode] = useState('text'); // 'text', 'number', 'hex', 'program'
+  const [inputMode, setInputMode] = useState('text');
   const [inputHistory, setInputHistory] = useState([]);
 
   const handleSubmit = (e) => {
@@ -13,14 +13,11 @@ const KeyboardInput = ({ onInput, onProgramSubmit }) => {
 
     let output;
     let programOutput = null;
+    let commandData = null;
 
     switch (inputMode) {
       case 'number':
-        if (!isNaN(inputValue)) {
-          output = `Número ingresado: ${inputValue} (Decimal)`;
-        } else {
-          output = `Entrada inválida: ${inputValue} no es un número`;
-        }
+        output = `Número ingresado: ${inputValue}`;
         break;
 
       case 'hex':
@@ -43,22 +40,73 @@ const KeyboardInput = ({ onInput, onProgramSubmit }) => {
         break;
       }
 
-      default: // text
-        output = `Entrada recibida: ${inputValue}`;
+      default: // text mode - procesar comandos
+        if (inputValue.toLowerCase() === 'help') {
+          output = `Comandos disponibles:
+          - save [dir] [valor]: Guarda valor en memoria (ej: save 5 10101010)
+          - mem [dir]: Muestra contenido de memoria
+          - reg: Muestra registros
+          - run: Ejecuta programa
+          - step: Ejecuta paso a paso
+          - reset: Reinicia el simulador`;
+        } 
+        else if (inputValue.startsWith('save ')) {
+          const saveMatch = inputValue.match(/^save\s+(\d+)\s+([01]+|\d+|0x[0-9A-Fa-f]+)$/i);
+          if (saveMatch) {
+            commandData = {
+              type: 'save',
+              address: saveMatch[1],
+              value: saveMatch[2]
+            };
+            output = `Procesando comando: guardar ${saveMatch[2]} en dirección ${saveMatch[1]}`;
+          } else {
+            output = `Formato inválido. Use: save [dirección] [valor] (ej: save 5 10101010)`;
+          }
+        }
+        else if (inputValue.startsWith('mem ')) {
+          const memMatch = inputValue.match(/^mem\s+(\d+)$/);
+          if (memMatch) {
+            commandData = {
+              type: 'mem',
+              address: memMatch[1]
+            };
+            output = `Solicitando contenido de memoria en dirección ${memMatch[1]}`;
+          } else {
+            output = `Formato inválido. Use: mem [dirección]`;
+          }
+        }
+        else {
+          output = `Entrada recibida: ${inputValue}`;
+        }
     }
 
     // Agregar a historial
     setInputHistory(prev => [
-      { input: inputValue, output, timestamp: new Date(), mode: inputMode },
-      ...prev.slice(0, 9) // Mantener solo 10 elementos
+      { 
+        input: inputValue, 
+        output, 
+        timestamp: new Date().toLocaleTimeString(), 
+        mode: inputMode 
+      },
+      ...prev.slice(0, 9) // Mantener máximo 10 elementos en historial
     ]);
 
-    // Enviar salida
-    onInput(output);
-    
-    // Si es un programa válido, enviarlo al simulador
-    if (programOutput && onProgramSubmit) {
+    // Procesar comandos especiales
+    if (commandData) {
+      switch(commandData.type) {
+        case 'save':
+          if (onSaveToMemory) onSaveToMemory(commandData.address, commandData.value);
+          break;
+        case 'mem':
+          if (onMemoryRead) onMemoryRead(commandData.address);
+          break;
+      }
+    } 
+    else if (programOutput && onProgramSubmit) {
       onProgramSubmit(programOutput);
+    } 
+    else {
+      onInput(output);
     }
 
     setInputValue('');
@@ -131,7 +179,7 @@ const KeyboardInput = ({ onInput, onProgramSubmit }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={
-              inputMode === 'text' ? 'Escribe texto...' :
+              inputMode === 'text' ? 'Escribe texto o comandos...' :
               inputMode === 'number' ? 'Ingresa número decimal...' :
               inputMode === 'hex' ? 'Ingresa valor hexadecimal (0x...)':
               'Escribe instrucciones...'
@@ -142,29 +190,27 @@ const KeyboardInput = ({ onInput, onProgramSubmit }) => {
         <button type="submit">Enviar</button>
       </form>
 
-      {inputHistory.length > 0 && (
-        <div className="input-history">
-          <h4>Historial:</h4>
-          <ul>
-            {inputHistory.map((item, index) => (
-              <li key={index} className={`history-item ${item.mode}`}>
-                <span className="timestamp">
-                  {item.timestamp.toLocaleTimeString()}:
-                </span>
-                <span className="input">{item.input}</span>
-                <span className="output">{item.output}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="input-history">
+        <h4>Historial:</h4>
+        <ul>
+          {inputHistory.map((item, index) => (
+            <li key={index} className={`history-item ${item.mode}`}>
+              <span className="timestamp">{item.timestamp}:</span>
+              <span className="input">{item.input}</span>
+              {item.output && <div className="output">{item.output}</div>}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
 
 KeyboardInput.propTypes = {
   onInput: PropTypes.func.isRequired,
-  onProgramSubmit: PropTypes.func
+  onProgramSubmit: PropTypes.func,
+  onSaveToMemory: PropTypes.func,
+  onMemoryRead: PropTypes.func
 };
 
 export default KeyboardInput;

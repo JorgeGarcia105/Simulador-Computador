@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 const RAM = ({ memory = [], onMemoryChange }) => {
   const [activeAddress, setActiveAddress] = useState(null)
+  const [inputValue, setInputValue] = useState('');
 
   if (!Array.isArray(memory)) {
     console.error('RAM: memory prop debe ser un array', memory)
@@ -10,13 +11,18 @@ const RAM = ({ memory = [], onMemoryChange }) => {
   }
 
   const handleCellClick = (address) => {
-    setActiveAddress(address)
+    setActiveAddress(address);
+    setInputValue(memory[address] || '');  // Set input value based on memory at address
   }
 
   const handleValueChange = (e) => {
+    setInputValue(e.target.value);
+  }
+
+  const handleSaveValue = () => {
     if (activeAddress !== null) {
-      const newValue = parseInt(e.target.value, 10) || 0
-      onMemoryChange(activeAddress, newValue)
+      const newValue = parseInt(inputValue, 10) || 0;
+      onMemoryChange(activeAddress, newValue);
     }
   }
 
@@ -34,11 +40,22 @@ const RAM = ({ memory = [], onMemoryChange }) => {
             <input
               type="text"
               value={value}
-              onChange={handleValueChange}
+              onChange={(e) => onMemoryChange(address, parseInt(e.target.value, 10) || 0)}
               className="memory-value"
             />
           </div>
         ))}
+      </div>
+
+      {/* Formulario para ingresar valor manualmente en una dirección específica */}
+      <div className="input-section">
+        <input
+          type="number"
+          value={inputValue}
+          onChange={handleValueChange}
+          placeholder="Nuevo valor"
+        />
+        <button onClick={handleSaveValue}>Guardar en Dirección</button>
       </div>
     </div>
   )
