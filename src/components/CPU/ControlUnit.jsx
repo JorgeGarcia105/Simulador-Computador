@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ControlUnit = ({ currentStep }) => {
   const steps = {
     fetch: 'Fetch (Búsqueda)',
@@ -5,43 +7,60 @@ const ControlUnit = ({ currentStep }) => {
     execute: 'Execute (Ejecución)',
     interrupt: 'Interrupción',
     halt: 'Detenido'
-  }
+  };
 
   return (
     <div className="control-unit">
       <h3>Unidad de Control</h3>
       <div className="control-signals">
-        <div className={`signal ${currentStep === 'fetch' ? 'active' : ''}`}>
-          {steps.fetch}
-        </div>
-        <div className={`signal ${currentStep === 'decode' ? 'active' : ''}`}>
-          {steps.decode}
-        </div>
-        <div className={`signal ${currentStep === 'execute' ? 'active' : ''}`}>
-          {steps.execute}
-        </div>
+        {Object.keys(steps).map((step) => (
+          <div key={step} className={`signal ${currentStep === step ? 'active' : ''}`}>
+            {steps[step]}
+          </div>
+        ))}
       </div>
+
       <div className="micro-operations">
         <h4>Micro-operaciones:</h4>
         <ul>
           {currentStep === 'fetch' && (
             <>
-              <li>MAR ← PC</li>
-              <li>MBR ← Memoria[MAR]</li>
-              <li>IR ← MBR</li>
-              <li>PC ← PC + 1</li>
+              <li>MAR ← PC (Cargar dirección del PC a MAR)</li>
+              <li>MBR ← Memoria[MAR] (Cargar la memoria en MBR desde la dirección MAR)</li>
+              <li>IR ← MBR (Cargar el valor de MBR en el registro IR)</li>
+              <li>PC ← PC + 1 (Incrementar el valor de PC en 1)</li>
             </>
           )}
           {currentStep === 'decode' && (
-            <li>Decodificar instrucción en IR</li>
+            <>
+              <li>Decodificar instrucción en IR (Interpretar la instrucción en IR)</li>
+              <li>Obtener operandos (Si es necesario, cargar operandos desde memoria)</li>
+            </>
           )}
           {currentStep === 'execute' && (
-            <li>Ejecutar operación según IR</li>
+            <>
+              <li>Ejecutar operación según IR (Ejecutar la operación definida por IR)</li>
+              <li>Actualizar registros según el resultado de la operación</li>
+              <li>Si hay acceso a memoria, realizar las operaciones necesarias (lectura/escritura)</li>
+            </>
+          )}
+          {currentStep === 'interrupt' && (
+            <>
+              <li>Manejar interrupción (Si hay interrupción, procesar la interrupción)</li>
+              <li>Guardar estado actual (Si es necesario, guardar el estado de los registros)</li>
+              <li>Actualizar PC y registros de control</li>
+            </>
+          )}
+          {currentStep === 'halt' && (
+            <>
+              <li>Detener CPU (Poner la CPU en un estado de paro)</li>
+              <li>Deshabilitar operaciones (Desactivar las señales de control)</li>
+            </>
           )}
         </ul>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ControlUnit
+export default ControlUnit;

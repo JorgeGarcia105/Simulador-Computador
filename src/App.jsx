@@ -11,7 +11,7 @@ import KeyboardInput from './components/IO/KeyboardInput';
 import ScreenOutput from './components/IO/ScreenOutput';
 import DiskDrive from './components/Disk/DiskDrive';
 import InstructionSet from './components/InstructionSet';
-import './styles/global.css';
+import BusAnimation from './components/BusSystem/BusAnimation.jsx';
 
 // Constantes para el tamaño de datos
 const WORD_SIZE = 8; // 8 bits para palabras
@@ -28,6 +28,7 @@ const fromBinary = (binaryStr) => {
 
 function App() {
   // Estado inicial
+  console.log("Inicializando estado del simulador...");
   const initialState = {
     cpu: {
       registers: {
@@ -45,15 +46,31 @@ function App() {
       }
     },
     memory: {
-      ram: Array(2**ADDRESS_SIZE).fill(toBinary(0)),
+      ram: JSON.parse(localStorage.getItem('simulator_ram_data')) || 
+           Array(256).fill('00000000'),
       rom: [
-        toBinary(0b00010010, 16), // LOAD 0x02
-        toBinary(0b00100011, 16), // ADD 0x03
-        toBinary(0b00110100, 16), // STORE 0x04
-        toBinary(0b11110000, 16), // HLT
-        ...Array(252).fill(toBinary(0b11010000, 16)) // NOPs
+        '0001000000000010', // LOAD 2
+        '0001000000000001', // LOAD 1
+        '0011000000000011', // ADD 3
+        '0010000000000100', // STORE 4
+        '1111000000000000', // HLT
+        // Nuevas instrucciones
+        '0101000000000101', // SUB 5
+        '0110000000000110', // MUL 6
+        '0011000000000111', // ADD 7
+        '0001000000001000', // LOAD 8
+        '1100000000001001', // JMP 9
+        '1110000000001010', // JZ 10
+        '1011000000001011', // AND 11
+        '1010000000001100', // OR 12
+        '1001000000001101', // XOR 13
+        '1111111111111111', // NOP (No Operation)
+        '1000000000001110', // MOV 14
+        // Puedes seguir agregando más líneas aquí...
       ]
     },
+    
+    instructionSet: InstructionSet,
     buses: {
       data: toBinary(0),
       address: toBinary(0, ADDRESS_SIZE),
@@ -73,7 +90,6 @@ function App() {
     currentStep: 'fetch'
   };
 
-  // Estado principal del sistema
   const [systemState, setSystemState] = useState(initialState);
   const [aluResult, setAluResult] = useState({
     result: toBinary(0),
@@ -84,6 +100,7 @@ function App() {
   const updateMemory = (address, value) => {
     const newRam = [...systemState.memory.ram];
     newRam[fromBinary(address)] = value.padStart(WORD_SIZE, '0');
+    
     setSystemState(prev => ({
       ...prev,
       memory: {
@@ -91,9 +108,13 @@ function App() {
         ram: newRam
       }
     }));
+  
+    // Guardar automáticamente en localStorage
+    localStorage.setItem('simulator_ram_data', JSON.stringify(newRam));
   };
 
   const handleInput = (input) => {
+    console.log(`Entrada recibida: ${input}`);
     if (input.toLowerCase() === 'help') {
       handleOutput('text', 
         `Comandos disponibles:
@@ -107,13 +128,13 @@ function App() {
         - save [dir] [valor]: Guarda un valor en memoria (ej: save 5 10101010 o save 5 170)`);
       return;
     }
-  
+
     // Comando para mostrar memoria
     const memCommand = input.match(/^mem\s+(\d+)$/);
     if (memCommand) {
       const [_, addressStr] = memCommand;
       const addressNum = parseInt(addressStr, 10);
-      
+      console.log(`Comando mem detectado. Dirección: ${addressNum}`);
       if (addressNum < 0 || addressNum >= 2**ADDRESS_SIZE) {
         handleOutput('text', 'Error: Dirección fuera de rango (0-255)');
         return;
@@ -127,17 +148,20 @@ function App() {
         Valor: ${value} (${fromBinary(value)})`);
       return;
     }
-  
+
     // Comando de guardar en memoria (acepta binario, decimal o hexadecimal)
     const saveCommand = input.match(/^save\s+(\d+)\s+([01]+|\d+|0x[0-9a-fA-F]+)$/i);
     if (saveCommand) {
       const [_, addressStr, valueStr] = saveCommand;
+      console.log(`Comando save detectado. Dirección: ${addressStr}, Valor: ${valueStr}`);
       handleSaveToMemory(addressStr, valueStr);
       return;
     }
+    
 
     // Comando reset-all (reinicio completo)
     if (input === 'reset-all') {
+      console.log('Comando reset-all detectado.');
       if (window.confirm('¿Reiniciar completamente? Esto borrará toda la RAM')) {
         resetSimulator(true);
       }
@@ -146,11 +170,11 @@ function App() {
 
     // Comando reset normal (conserva RAM)
     if (input === 'reset') {
+      console.log('Comando reset detectado.');
       resetSimulator(false);
       return;
     }
-  
-    // Resto del código para otros comandos...
+
     setSystemState(prev => ({
       ...prev,
       io: {
@@ -165,6 +189,7 @@ function App() {
   };
 
   const handleOutput = (type, content) => {
+    console.log(`Actualizando salida. Tipo: ${type}, Contenido: ${content}`);
     setSystemState(prev => {
       const newOutput = {...prev.io.output};
       
@@ -202,19 +227,24 @@ function App() {
     });
   };
 
-  // Ejecutar siguiente instrucción
   const executeNextInstruction = () => {
+    console.log('Ejecutando siguiente instrucción...');
     const pc = systemState.cpu.registers.PC;
     const pcNum = fromBinary(pc);
+    console.log(`PC actual: ${pc} (${pcNum})`);
     
     if (pcNum >= systemState.memory.rom.length) {
       handleOutput('text', 'Fin del programa (PC fuera de ROM)');
       setSystemState(prev => ({ ...prev, running: false }));
       return;
     }
+    let op = '';
 
     const instruction = systemState.memory.rom[pcNum];
+    console.log(`Instrucción obtenida: ${instruction}`);
     const { opcode, operand } = decodeInstruction(instruction);
+    console.log(`Instrucción decodificada: ${instruction} -> Opcode: ${opcode}, Operando: ${operand}`);
+    console.log(`Decodificada: Opcode: ${opcode}, Operando: ${operand}`);
     const address = operand;
 
     handleOutput('text', `[PC: ${pc}] Ejecutando: ${opcode} ${operand}`);
@@ -224,7 +254,7 @@ function App() {
     try {
       switch(newState.currentStep) {
         case 'fetch':
-          // FETCH
+          console.log('Paso FETCH');
           newState.cpu.registers.MAR = pc;
           newState.buses.address = pc;
           newState.cpu.registers.MBR = instruction;
@@ -235,55 +265,71 @@ function App() {
           break;
           
         case 'decode':
-          // DECODE
+          console.log('Paso DECODE');
           newState.buses.control = toBinary(0b0010, 4);
           newState.currentStep = 'execute';
           break;
-          
+
         case 'execute':
-          // EXECUTE
+          console.log('Paso EXECUTE');
           newState.buses.control = toBinary(0b0100, 4);
           
-          // Preparar operandos para ALU
-          newState.cpu.alu.operandA = newState.cpu.registers.ACC;
-          
+          newState.cpu.alu.operandA = newState.cpu.registers.ACC; // Preparar operandos para ALU
+          newState.cpu.alu.operation = op; // Establecer operación ALU
+
           switch(opcode) {
             case '0001': // LOAD
-              newState.cpu.registers.MAR = address;
-              newState.buses.address = address;
-              newState.cpu.registers.MBR = newState.memory.ram[fromBinary(address)];
-              newState.cpu.registers.ACC = newState.cpu.registers.MBR;
-              newState.buses.data = newState.cpu.registers.ACC;
-              newState.cpu.registers.PC = toBinary(pcNum + 1, ADDRESS_SIZE);
+              console.log('Ejecutando LOAD');
+              newState.cpu.registers.MAR = address; // Dirección de memoria
+              newState.buses.address = address; // Actualiza bus de dirección
+              newState.cpu.registers.MBR = newState.memory.ram[fromBinary(address)]; // Cargar valor de RAM en MBR
+              newState.cpu.registers.ACC = newState.cpu.registers.MBR; // Cargar MBR en ACC
+              newState.buses.data = newState.cpu.registers.ACC; // Actualiza bus de datos
+              op = 'LOAD'; // Establecer operación ALU
+              newState.cpu.alu.operation = op; // Establecer operación ALU
+              newState.cpu.registers.PC = toBinary(pcNum + 1, ADDRESS_SIZE); // Actualiza PC
+              newState.cpu.registers.FLAGS = toBinary(0, 4); // Reiniciar flags
               break;
-              
             case '0010': // ADD
-              newState.cpu.registers.MAR = address;
-              newState.buses.address = address;
-              newState.cpu.registers.MBR = newState.memory.ram[fromBinary(address)];
-              newState.cpu.alu.operation = 'ADD';
-              newState.cpu.alu.operandB = newState.cpu.registers.MBR;
-              break;
+              console.log('Ejecutando ADD');
+              newState.cpu.registers.MAR = address; // Dirección de memoria
+              newState.buses.address = address; // Actualiza bus de dirección
+              newState.cpu.registers.MBR = newState.memory.ram[fromBinary(address)]; // Cargar valor de RAM en MBR
+              newState.cpu.alu.operandB = newState.cpu.registers.MBR; // Cargar MBR en operando B
+              op = 'ADD'; // Establecer operación ALU
+              newState.cpu.alu.operation = op; // Establecer operación ALU
+              newState.cpu.alu.operandB = newState.cpu.registers.MBR;  // Cargar MBR en operando B
+              console.log(`Operandos para ALU: A=${newState.cpu.alu.operandA}, B=${newState.cpu.alu.operandB}`); 
+              break; 
               
             case '0011': // STORE
-              newState.cpu.registers.MAR = address;
-              newState.cpu.registers.MBR = newState.cpu.registers.ACC;
-              newState.memory.ram[fromBinary(address)] = newState.cpu.registers.MBR;
-              newState.memory.ram = [...newState.memory.ram];
-              newState.buses.address = address;
-              newState.buses.data = newState.cpu.registers.MBR;
-              newState.cpu.registers.PC = toBinary(pcNum + 1, ADDRESS_SIZE);
+              console.log('Ejecutando STORE'); 
+              newState.cpu.registers.MAR = address; // Dirección de memoria 
+              newState.cpu.registers.MBR = newState.cpu.registers.ACC; // Cargar ACC en MBR
+              // Actualiza RAM(con la direccion del segundo dato) con el valor de MBR
+              newState.memory.ram[fromBinary(address)] = newState.cpu.registers.MBR; 
+              newState.memory.ram = [...newState.memory.ram]; // Forzar re-render
+              newState.buses.address = address; // Actualiza bus de dirección
+              newState.buses.data = newState.cpu.registers.MBR; // Actualiza bus de datos
+              op = 'STORE'; // Establecer operación ALU
+              newState.cpu.alu.operation = op; // Establecer operación ALU
+              newState.cpu.registers.PC = toBinary(pcNum + 1, ADDRESS_SIZE); // Actualiza PC
               break;
               
             case '1111': // HLT
-              newState.running = false;
-              handleOutput('text', 'Programa detenido (HLT)');
+              console.log('Ejecutando HLT');
+              newState.running = false; // Detener ejecución
+              op = 'HLT'; // Establecer operación ALU
+              newState.cpu.alu.operation = op; // Establecer operación ALU
+              handleOutput('text', 'Programa detenido (HLT)'); 
               break;
               
             default:
+              console.log(`Instrucción no implementada: ${opcode}`);
               handleOutput('text', `Instrucción no implementada: ${opcode}`);
               newState.cpu.registers.PC = toBinary(pcNum + 1, ADDRESS_SIZE);
           }
+          console.log(`Ejecutando instrucción [PC: ${pc}] - Paso: ${newState.currentStep}`);
           
           newState.currentStep = 'fetch';
           break;
@@ -292,6 +338,7 @@ function App() {
       setSystemState(newState);
       
     } catch (error) {
+      console.error(`Error durante la ejecución: ${error.message}`);
       handleOutput('text', `Error: ${error.message}`);
       setSystemState(prev => ({ ...prev, running: false }));
     }
@@ -299,17 +346,20 @@ function App() {
 
   const handleSaveToMemory = (addressStr, valueStr) => {
     try {
-      const address = parseInt(addressStr, 10);
-      if (address < 0 || address >= 2**ADDRESS_SIZE) {
+      const address = parseInt(addressStr, 10); // Dirección de memoria
+      if (isNaN(address)) {
+        throw new Error('Dirección inválida. Debe ser un número entero.');
+      }
+      if (address < 0 || address >= 2**ADDRESS_SIZE) { // Rango de direcciones
         throw new Error(`Dirección inválida. Rango permitido: 0-${2**ADDRESS_SIZE-1}`);
       }
-
-      let binaryValue;
+  
+      let binaryValue; // Valor a guardar en memoria
+      // Validar el valor ingresado (binario, hexadecimal o decimal)
+      // Acepta binario (0b), hexadecimal (0x) o decimal
       if (/^[01]+$/.test(valueStr)) { // Binario
-        if (valueStr.length > WORD_SIZE) {
-          throw new Error(`Valor binario debe tener máximo ${WORD_SIZE} bits`);
-        }
-        binaryValue = valueStr.padStart(WORD_SIZE, '0');
+        // Asegurarse de que el valor binario tenga el formato correcto
+        binaryValue = '0b' + valueStr.padStart(WORD_SIZE, '0');
       } 
       else if (/^0x[0-9a-fA-F]+$/.test(valueStr)) { // Hexadecimal
         const num = parseInt(valueStr, 16);
@@ -320,12 +370,15 @@ function App() {
       }
       else { // Decimal
         const num = parseInt(valueStr, 10);
+        if (!Number.isInteger(num)) {  // Verificar si el número es entero
+          throw new Error(`El valor decimal debe ser un número entero.`);
+        }
         if (num < 0 || num >= 2**WORD_SIZE) {
           throw new Error(`Valor decimal debe estar entre 0-${2**WORD_SIZE-1}`);
         }
         binaryValue = toBinary(num, WORD_SIZE);
       }
-
+  
       updateMemory(toBinary(address, ADDRESS_SIZE), binaryValue);
       handleOutput('text', `Dato guardado: Dir. ${address} = ${binaryValue} (${fromBinary(binaryValue)})`);
       
@@ -333,6 +386,7 @@ function App() {
       handleOutput('text', `Error: ${error.message}`);
     }
   };
+  
 
   const handleMemoryRead = (addressStr) => {
     const address = parseInt(addressStr, 10);
@@ -469,8 +523,9 @@ function App() {
           />
           <ROM 
             memory={systemState.memory.rom} 
-            currentAddress={systemState.cpu.registers.PC}
             wordSize={16}
+            currentAddress={fromBinary(systemState.cpu.registers.PC)}
+            instructionSet={systemState.instructionSet}
           />
         </div>
         
@@ -487,6 +542,8 @@ function App() {
             label="Dirección"
             size={ADDRESS_SIZE}
           />
+          <BusAnimation type="address" {...systemState.buses.address} />
+          <BusAnimation type="data" {...systemState.buses.data} />
           <ControlBus 
             signal={systemState.buses.control} 
             label="Control"
