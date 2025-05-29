@@ -1,0 +1,28 @@
+.internal-bus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.1em;
+  background: #eaf6fb;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px #3fa7d622;
+}
+.bus-arrow {
+  color: #3fa7d6;
+  font-weight: bold;
+  animation: blink 0.7s linear infinite alternate;
+}
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+.bus-value {
+  font-family: 'Fira Code', monospace;
+  background: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  color: #223355;
+}

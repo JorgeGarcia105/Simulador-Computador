@@ -1,17 +1,15 @@
 Estructura Mejorada (Basada en tus necesidades)
-plaintext
-Copiar
-Editar
+
+
 computador-simulador/
 ├── public/
 ├── src/
 │   ├── components/
 │   │   ├── CPU/
-│   │   │   ├── CPU.jsx
 │   │   │   ├── ALU.jsx
 │   │   │   ├── Registers.jsx
 │   │   │   ├── ControlUnit.jsx
-│   │   │   └── Multiplexer.jsx  # Nuevo
+│   │   │   └── Multiplexer.jsx  # Nuevo No implementado
 │   │   ├── Memory/
 │   │   │   ├── RAM.jsx
 │   │   │   ├── ROM.jsx
@@ -20,21 +18,28 @@ computador-simulador/
 │   │   │   ├── DataBus.jsx
 │   │   │   ├── AddressBus.jsx
 │   │   │   ├── ControlBus.jsx
-│   │   │   └── InterruptHandler.jsx # Nuevo
+│   │   │   ├── BusSystem.jsx
+│   │   │   ├── BusSystem.css
+│   │   │   └── InterruptHandler.jsx # Nuevo No implementado
 │   │   ├── IO/
 │   │   │   ├── KeyboardInput.jsx
-│   │   │   ├── ScreenOutput.jsx
-│   │   │   └── PrinterOutput.jsx  # Opcional
+│   │   │   ├── ScreenOutput.jsx  No implementado por completo
+│   │   │   └── PrinterOutput.jsx  # Opcional No implementado
 │   │   ├── Disk/
-│   │   │   └── DiskDrive.jsx
+│   │   │   └── DiskDrive.jsx No implementado
 │   │   └── InstructionSet.jsx
 │   ├── services/
 │   │   ├── FetchDecodeExecuteCycle.js # Nuevo
 │   ├── hooks/
 │   │   ├── useMemory.js
 │   │   ├── useCPU.js
+│   │   ├── useCommandHandlers.js
+│   │   ├── useInstructionCycle.js
 │   ├── utils/
 │   │   ├── binaryUtils.js
+│   │   ├── decideinstruction.js
+│   │   ├── initialstate.js
+│   │   ├── useInstructionCycle.js
 │   │   ├── instructionParser.js
 │   ├── App.jsx
 │   ├── main.jsx
@@ -59,7 +64,7 @@ Simular CPU Básica
 
 Registers.jsx → implementar registros (PC, IR, ACC, etc.).
 
-ALU.jsx → suma, resta (operaciones básicas).
+ALU.jsx → suma, resta (operaciones básicas). etc...
 
 ControlUnit.jsx → lógica de control muy sencilla (fetch → decode → execute).
 
@@ -83,7 +88,7 @@ InstructionSet.jsx
 
 Definir un pequeño set de instrucciones tipo:
 
-LOAD, STORE, ADD, SUB, JMP, NOP.
+LOAD, STORE, ADD, SUB, JMP, NOP...
 
 Ciclo Básico de Instrucción
 
@@ -106,11 +111,11 @@ Tareas:
 
 Implementar banderas de la ALU (Zero, Carry, Overflow, etc.).
 
-Agregar Disco Secundario (DiskDrive.jsx).
+Agregar Disco Secundario (DiskDrive.jsx). Por ahora no agregar solo esta en pensado.
 
-Implementar Sistema de Interrupciones (keyboard, fallos de memoria).
+Implementar Sistema de Interrupciones (keyboard, fallos de memoria). aun no implementado
 
-Agregar Multiplexores (MUX) para controlar flujos de buses.
+Agregar Multiplexores (MUX) para controlar flujos de buses. no implementado
 
 Mostrar el estado de los buses en tiempo real (valor transportado).
 
@@ -119,22 +124,22 @@ Objetivo: Simular características de computadoras más reales.
 
 Tareas:
 
-Pipeline (Fetch → Decode → Execute en paralelo).
+Pipeline (Fetch → Decode → Execute en paralelo). no implementado
 
-Memoria Cache (simular caché L1, L2 opcional).
+Memoria Cache (simular caché L1, L2 opcional).no implementada aun
 
-Planificación de tareas (pequeño scheduler de procesos).
+Planificación de tareas (pequeño scheduler de procesos). no implementado
 
 Microinstrucciones (control unit basada en microcódigo).
 
-Testing Unitario (Vitest, Jest).
+Testing Unitario (Vitest, Jest). 
 
 📚 Extras muy Pro
 Tutoriales integrados para el usuario.
 
-Exportar/Importar programas en formato JSON.
+Exportar/Importar programas en formato JSON. no implementado
 
-Reportes de ejecución (estadísticas de instrucciones, tiempos).
+Reportes de ejecución (estadísticas de instrucciones, tiempos). no implementado
 
 ✅ Paso inmediato ahora:
 Si quieres arrancar ya, yo te recomiendo que empecemos hoy mismo con:

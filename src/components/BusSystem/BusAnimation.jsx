@@ -1,31 +1,61 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
-const BusAnimation = ({ type, value, active }) => {
+const BusAnimation = ({ 
+  type, 
+  value, 
+  active, 
+  direction = 'none',
+  width = 8 
+}) => {
   const busConfig = {
-    address: { color: '#A5D6A7', label: 'Bus de Direcciones' },  // Azul más claro
-    data: { color: '#1976D2', label: 'Bus de Datos' },          // Azul más oscuro
-    control: { color: '#F57C00', label: 'Bus de Control' }     // Naranja más fuerte
+    address: { 
+      color: '#4DD0E1', 
+      label: 'Address Bus',
+      width: 16
+    },
+    data: { 
+      color: '#7986CB', 
+      label: 'Data Bus',
+      width: width
+    },
+    control: { 
+      color: '#FFB74D', 
+      label: 'Control Bus',
+      width: 1
+    }
   };
 
-  // Verificar si 'value' es un número válido
-  const formattedValue = value !== null && value !== undefined && !isNaN(value)
-    ? `0x${value.toString(16).toUpperCase()}`
-    : '---';
+  const formatValue = (val) => {
+    if (val === null || val === undefined) return '---';
+    const hexLength = Math.ceil(busConfig[type].width / 4);
+    return `0x${val.toString(16).padStart(hexLength, '0').toUpperCase()}`;
+  };
 
   return (
-    <div className={`bus ${type}`} style={{ 
-      backgroundColor: busConfig[type].color,
-      opacity: active ? 1 : 0.3,
-      transform: active ? 'scale(1.02)' : 'scale(1)'
-    }}>
-      <div className="bus-label">{busConfig[type].label}</div>
-      <div className="bus-value">
-        {formattedValue}
+    <div 
+      className={`bus-animation ${type} ${active ? 'active' : ''} direction-${direction}`}
+      style={{ 
+        '--bus-color': busConfig[type].color,
+        '--bus-width': `${busConfig[type].width * 10}px`
+      }}
+    >
+      <div className="bus-label">
+        {busConfig[type].label} ({busConfig[type].width} bits)
       </div>
-      <div className="bus-activity" style={{ 
-        visibility: active ? 'visible' : 'hidden' 
-      }}></div>
+      <div className="bus-value-container">
+        <div className="bus-value">{formatValue(value)}</div>
+        {direction !== 'none' && (
+          <div className={`direction-indicator ${direction}`}>
+            {direction === 'in' ? '⬅' : direction === 'out' ? '➡' : '⬌'}
+          </div>
+        )}
+      </div>
+      <div className="bus-activity-light" />
+      <div className="bus-wire">
+        {Array.from({ length: busConfig[type].width }).map((_, i) => (
+          <div key={i} className="wire-bit" />
+        ))}
+      </div>
     </div>
   );
 };
@@ -33,7 +63,15 @@ const BusAnimation = ({ type, value, active }) => {
 BusAnimation.propTypes = {
   type: PropTypes.oneOf(['address', 'data', 'control']).isRequired,
   value: PropTypes.number,
-  active: PropTypes.bool
+  active: PropTypes.bool,
+  direction: PropTypes.oneOf(['in', 'out', 'none', 'bidirectional']),
+  width: PropTypes.number
+};
+
+BusAnimation.defaultProps = {
+  active: false,
+  direction: 'none',
+  width: 8
 };
 
 export default BusAnimation;

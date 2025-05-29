@@ -13,8 +13,6 @@ export const executeCycle = () => {
   // Paso 1: FETCH - Obtener instrucción de memoria
   const fetchInstruction = () => {
     const pc = binToDec(registers.PC);
-    
-    // Leer opcode (primer byte)
     registers.MAR = decToBin(pc, 12); // Usar 12 bits para direcciones
     const opcodeByte = readMemory(pc);
     
@@ -80,6 +78,7 @@ export const executeCycle = () => {
         
       case '0010': // STORE
         registers.MAR = decoded.operand;
+        console.log('STORE ejecutado: ACC =', registers.ACC, '-> RAM[', operandAddr, ']');
         writeMemory(operandAddr, registers.ACC);
         setRegisters({
           ...registers,

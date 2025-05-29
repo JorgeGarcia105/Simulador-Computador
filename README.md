@@ -1,133 +1,238 @@
-Simulador de Computador con React + Vite
-📌 Descripción del Proyecto
-Este proyecto es un simulador visual e interactivo de un computador básico, diseñado para ayudar a entender los conceptos fundamentales de arquitectura de computadores. Implementa los componentes principales de un sistema computacional y muestra su funcionamiento interno.
+Claro, aquí tienes una **documentación formal y profesional** para tu proyecto, ideal para README o documentación interna. Puedes adaptarla según tus necesidades.
 
-🚀 Características Principales
-⚙️ CPU Simulada
-Registros visibles: PC, IR, ACC, MAR, MBR, FLAGS
+---
 
-ALU funcional: Operaciones aritméticas y lógicas básicas
+# Simulador de Arquitectura de Computador
 
-Unidad de Control: Visualización del ciclo Fetch-Decode-Execute
+## Descripción General
 
-🧠 Subsistema de Memoria
-RAM editable: Permite modificar valores directamente
+El **Simulador de Arquitectura de Computador** es una herramienta interactiva desarrollada en React que permite visualizar, comprender y experimentar con los principales componentes de una computadora a nivel de hardware. El simulador está orientado a la docencia y la experimentación, facilitando la observación del ciclo de instrucción (Fetch-Decode-Execute), el flujo de datos y el funcionamiento de la memoria, la CPU y los buses.
 
-ROM de solo lectura: Muestra contenido predefinido
+---
 
-Visualización hexadecimal/decimal
+## Tabla de Contenidos
 
-🚌 Sistema de Buses
-Bus de Datos: Muestra el flujo de información
+- Estructura del Proyecto
+- Componentes Principales
+- Ciclo de Instrucción
+- Set de Instrucciones
+- Requisitos y Ejecución
+- Ejemplo de Uso
+- Detalles Técnicos
+- Extensiones y Mejoras Futuras
+- Licencia
 
-Bus de Direcciones: Visualiza las direcciones accedidas
+---
 
-Bus de Control: Indica las señales activas
+## Estructura del Proyecto
 
-💾 Dispositivos de E/S
-Teclado simulado: Entrada de datos interactiva
+```
+simulador-computador/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── CPU/
+│   │   ├── Memory/
+│   │   ├── BusSystem/
+│   │   ├── IO/
+│   │   ├── Disk/
+│   │   └── InstructionSet.jsx
+│   ├── services/
+│   ├── hooks/
+│   ├── utils/
+│   ├── styles/
+│   ├── App.jsx
+│   ├── main.jsx
+├── package.json
+├── vite.config.js
+└── README.md
+```
 
-Pantalla de salida: Muestra resultados e interacciones
+---
 
-Unidad de disco: Simulación de almacenamiento secundario
+## Componentes Principales
 
-🖥️ Interfaz de Usuario
-Panel de control centralizado
+| Componente         | Descripción                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| **CPU**            | Incluye la ALU, registros y unidad de control.                              |
+| **ALU**            | Realiza operaciones aritméticas y lógicas, mostrando los flags de estado.   |
+| **Registers**      | Visualiza y permite modificar registros (PC, ACC, IR, MAR, MBR, FLAGS, etc) |
+| **ControlUnit**    | Muestra el estado del ciclo de instrucción y micro-operaciones.             |
+| **RAM**            | Memoria de acceso aleatorio editable, segmentada en datos y código.         |
+| **ROM**            | Memoria de solo lectura, almacena el programa a ejecutar.                   |
+| **BusSystem**      | Visualiza los buses de datos, direcciones y control.                        |
+| **KeyboardInput**  | Permite ingresar instrucciones o programas en ensamblador.                  |
+| **ScreenOutput**   | Muestra la salida del sistema, resultados y mensajes.                       |
+| **DiskDrive**      | Simula un disco secundario (opcional).                                      |
+| **InstructionSet** | Tabla visual del set de instrucciones soportadas.                           |
 
-Visualización paso a paso del flujo de datos
+---
 
-Animaciones para mejor comprensión
+## Ciclo de Instrucción
 
-🛠️ Tecnologías Utilizadas
-React + Vite (Entorno de desarrollo rápido)
+El simulador implementa el ciclo clásico de una CPU:
 
-CSS Modules (Para estilos componentizados)
+1. **Fetch (Búsqueda):** MAR ← PC; MBR ← Memoria[MAR]; IR ← MBR; PC ← PC + 1
+2. **Decode (Decodificación):** Decodifica la instrucción en IR, obtiene opcode y operandos.
+3. **Execute (Ejecución):** Ejecuta la operación (ALU, memoria, salto, E/S, etc.).
+4. **Interrupt/Halt:** Maneja interrupciones o detiene la CPU si corresponde.
 
-Framer Motion (Animaciones fluidas)
+Cada etapa se resalta visualmente y se muestran las micro-operaciones asociadas.
 
-React Icons (Conjunto de iconos visuales)
+---
 
-📦 Instalación y Uso
-Clonar el repositorio
+## Set de Instrucciones
 
-bash
-git clone https://github.com/tu-usuario/simulador-computador.git
-cd simulador-computador
-Instalar dependencias
+| Opcode | Nombre   | Descripción                        | Formato Binario Ejemplo |
+|--------|----------|------------------------------------|------------------------|
+| 0000   | NOP      | No operation                       | 0000 0000             |
+| 0001   | LOAD     | Carga memoria en ACC               | 0001 AAAA             |
+| 0010   | STORE    | Guarda ACC en memoria              | 0010 AAAA             |
+| 0011   | ADD      | Suma memoria a ACC                 | 0011 AAAA             |
+| 0100   | SUB      | Resta memoria de ACC               | 0100 AAAA             |
+| 0101   | JMP      | Salta a dirección                  | 0101 AAAA             |
+| 0110   | JZ       | Salta si cero                      | 0110 AAAA             |
+| 0111   | JC       | Salta si carry                     | 0111 AAAA             |
+| 1000   | OUT      | Muestra ACC en salida              | 1000 0000             |
+| 1001   | IN       | Lee entrada a ACC                  | 1001 0000             |
+| 1010   | AND      | AND lógico con ACC                 | 1010 AAAA             |
+| 1011   | OR       | OR lógico con ACC                  | 1011 AAAA             |
+| 1100   | XOR      | XOR lógico con ACC                 | 1100 AAAA             |
+| 1111   | HLT      | Detiene la CPU                     | 1111 0000             |
 
-bash
-npm install
-Ejecutar en modo desarrollo
+*Nota: AAAA representa la dirección u operando.*
 
-bash
-npm run dev
-Compilar para producción
+---
 
-bash
-npm run build
-npm run preview
-🎮 Funcionalidades Interactivas
-Ejecución de Programas
-Carga de programas básicos
+## Requisitos y Ejecución
 
-Ejecución paso a paso o automática
+### Requisitos
 
-Visualización del contador de programa (PC)
+- Node.js >= 14.x
+- npm >= 6.x
 
-Modificación en Tiempo Real
-Edición directa de la RAM
+### Instalación y Ejecución
 
-Cambio de valores en registros
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tuusuario/simulador-computador.git
+   cd simulador-computador
+   ```
 
-Interacción con dispositivos de E/S
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
 
-Simulación de Instrucciones
-assembly
-LOAD 0x10    # Cargar dato de memoria a ACC
-ADD 0x11     # Sumar valor de memoria al ACC
-STORE 0x12   # Almacenar ACC en memoria
-JMP 0x00     # Saltar a dirección
-HLT          # Detener ejecución
-📚 Conceptos de Arquitectura Cubiertos
-Ciclo de instrucción (Fetch-Decode-Execute)
+3. Inicia el simulador:
+   ```bash
+   npm run dev
+   ```
+   El simulador estará disponible en `http://localhost:5173` (o el puerto que indique Vite).
 
-Organización de la memoria
+---
 
-Flujo de datos a través de buses
+## Ejemplo de Uso
 
-Operaciones de la ALU
+### Cargar un Programa
 
-Mapeo de memoria y E/S
+1. Ve al panel "Teclado del Computador".
+2. Selecciona "Cargar Programa".
+3. Escribe instrucciones en ensamblador, una por línea:
+   ```
+   LOAD 1
+   ADD 2
+   STORE 3
+   HLT
+   ```
+4. Haz clic en "Enviar". El programa se carga en la ROM.
 
-Manejo de interrupciones
+### Ejecutar el Programa
 
-🎨 Diseño de la Interfaz
-Diagrama de Interfaz
+- Usa "Paso a Paso" para avanzar instrucción por instrucción y observar el ciclo.
+- Usa "Ejecutar Auto" para correr el programa automáticamente.
 
-La interfaz está organizada en secciones lógicas:
+### Visualizar Resultados
 
-Panel Superior: Controles de ejecución
+- Observa los cambios en los registros, memoria, buses y flags.
+- La salida aparecerá en el panel "Salida del Sistema".
 
-Sección CPU: Registros y ALU
+---
 
-Área de Memoria: RAM y ROM
+## Detalles Técnicos
 
-Buses: Visualización del flujo de datos
+### Arquitectura General
 
-Dispositivos E/S: Consola interactiva
+El simulador está construido con una arquitectura modular que refleja los componentes físicos de una computadora:
 
-🤝 Contribución
-Las contribuciones son bienvenidas. Por favor:
+- **Frontend (React):** Renderiza la interfaz visual y maneja la interacción con el usuario.
+- **Estado del Sistema:** Gestiona el estado central del computador en `initialState.js`.
+- **Ciclo Principal:** Implementa el ciclo fetch-decode-execute en FetchDecodeExecuteCycle.js.
+- **Componentes Físicos:** Cada componente de hardware tiene su propio módulo React.
 
-Haz un fork del proyecto
+### Representación de Datos
 
-Crea una rama para tu feature (git checkout -b feature/AmazingFeature)
+- **Sistema numérico:** Binario (base 2)
+- **Tamaño de palabra:** 12 bits (configurable en binaryUtils.js)
+- **Tamaño de dirección:** 12 bits (permite direccionar 4096 posiciones de memoria)
+- **Representación de números negativos:** Complemento a 2
+- **Flags:** Zero (Z), Sign (S), Carry (C), Overflow (O)
 
-Haz commit de tus cambios (git commit -m 'Add some AmazingFeature')
+### Organización de Memoria
 
-Haz push a la rama (git push origin feature/AmazingFeature)
+La memoria está dividida en los siguientes segmentos:
 
-Abre un Pull Request
+| Segmento       | Rango de Direcciones | Tamaño    | Uso                        |
+|----------------|----------------------|-----------|----------------------------|
+| Datos          | 0x000 - 0x7FF        | 2048 bytes| Variables, datos temporales|
+| Código         | 0x800 - 0xFFF        | 2048 bytes| Instrucciones del programa |
 
-📄 Licencia
-Distribuido bajo la licencia MIT. Consulta LICENSE para más información.
+Cada celda de memoria almacena un valor de 8 o 16 bits (configurable) representado como string binario.
+
+### Sistema de Buses
+
+La comunicación entre componentes sigue una arquitectura de bus:
+
+- **Bus de Datos:** Transfiere datos entre componentes (12 bits)
+- **Bus de Direcciones:** Indica la dirección de memoria a acceder (12 bits)
+- **Bus de Control:** Señales de control que coordinan los componentes (READ, WRITE, etc.)
+
+### Utilidades Binarias
+
+El módulo binaryUtils.js implementa las siguientes operaciones:
+
+```js
+// Conversiones básicas
+binaryToDec('101010', 12); // Convierte binario a decimal
+decToBinary(42, 12); // Convierte decimal a binario de 12 bits
+decToHex(42, 12); // Convierte decimal a hex con formato 0xXXX
+
+// Operaciones binarias puras
+binaryAdd('0101', '0011', 8); // Suma binaria con flags
+binarySubtract('1000', '0011', 8); // Resta binaria
+binaryAnd('1010', '1100', 8); // AND bit a bit
+binaryOr('1010', '1100', 8); // OR bit a bit
+binaryXor('1010', '1100', 8); // XOR bit a bit
+binaryNot('1010', 8); // NOT bit a bit
+```
+
+---
+
+## Extensiones y Mejoras Futuras
+
+- Pipeline visual (simular Fetch, Decode, Execute en paralelo)
+- Memoria caché (L1/L2)
+- Interrupciones y manejo de errores
+- Exportar/importar programas en JSON
+- Estadísticas de ejecución y profiling
+- Tutorial interactivo integrado
+
+---
+
+## Licencia
+
+MIT License
+
+---
+
+¿Necesitas una sección más detallada sobre algún componente, arquitectura interna, o instrucciones para desarrolladores? ¡Dímelo!

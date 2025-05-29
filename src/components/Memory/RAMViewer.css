@@ -1,0 +1,351 @@
+/* ===== COMPONENTE DE MEMORIA ===== */
+.memory-control {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.memory-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.memory-module {
+  background: #fff;
+  color: #e5eaf1;
+  border: 1.5px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.memory-grid {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  background-color: white;
+  max-height: 500px;
+  overflow-y: auto;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.memory-cell {
+  background: #2d3436;
+  color: #e5eaf1;
+  border: 1px solid #3d566e;
+  padding: 12px;
+  font-family: 'Fira Code', monospace;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.memory-cell:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.memory-cell.active {
+  border-color: #5dade2;
+  background: #34495e;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+.memory-cell .address {
+  font-size: 0.75em;
+  color: var(--text-light);
+  margin-bottom: 5px;
+}
+
+.memory-cell.data {
+  border-left: 5px solid #8e44ad;
+}
+
+.value {
+  font-family: 'Fira Code', monospace;
+  font-weight: bold;
+  word-break: break-all;
+}
+
+/* Estilos para Memoria RAM */
+.ram-component {
+  background: #fff;
+  color: #e5eaf1;
+  border: 1.5px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.view-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.view-controls button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.85em;
+  transition: var(--transition);
+}
+
+.view-controls button.active {
+  background: var(--secondary-color);
+  color: white;
+  border-color: var(--secondary-color);
+}
+
+/* Estilo para guardar los datos de memoria en celdas */
+.ram-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+
+.ram-cell {
+  background: #2d3436;
+  color: #e5eaf1;
+  border: 1px solid #3d566e;
+  padding: 8px;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.ram-cell:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+.cell-address {
+  font-size: 0.7em;
+  color: var(--text-light);
+  margin-bottom: 5px;
+}
+
+.cell-value {
+  font-weight: bold;
+}
+
+.ram-cell input {
+  width: 100%;
+  font-family: 'Fira Code', monospace;
+  text-align: center;
+  border: 1px solid var(--secondary-color);
+  padding: 5px;
+}
+
+/* Responsive para mejor organización en pantallas pequeñas */
+@media (max-width: 900px) {
+  .memory-system {
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+  }
+  .rom-section, .ram-section {
+    min-width: 0;
+    width: 100%;
+  }
+  .ram-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .memory-system {
+    padding: 5px;
+    gap: 6px;
+  }
+  .rom-section, .ram-section {
+    padding: 8px;
+  }
+  .ram-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+
+/* ===== COMPONENTE DE MEMORIA ===== */
+.memory-control {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.memory-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.memory-module {
+  background: #fff;
+  color: #e5eaf1;
+  border: 1.5px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+input {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: white;
+  transition: var(--transition);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Estilos para Memoria ROM */
+.memory-grid {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  background-color: white;
+  max-height: 500px;
+  overflow-y: auto;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.memory-cell {
+  background: #2d3436;
+  color: #e5eaf1;
+  border: 1px solid #3d566e;
+  padding: 12px;
+  font-family: 'Fira Code', monospace;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.memory-cell:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.memory-cell.active {
+  border-color: #5dade2;
+  background: #34495e;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+.memory-cell .address {
+  font-size: 0.75em;
+  color: var(--text-light);
+  margin-bottom: 5px;
+}
+
+.memory-cell.data {
+  border-left: 5px solid #8e44ad;
+}
+
+.value {
+  font-family: 'Fira Code', monospace;
+  font-weight: bold;
+  word-break: break-all;
+}
+
+/* Estilos para Memoria RAM */
+.ram-component {
+  background: #fff;
+  color: #e5eaf1;
+  border: 1.5px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.view-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.view-controls button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.85em;
+  transition: var(--transition);
+}
+
+.view-controls button.active {
+  background: var(--secondary-color);
+  color: white;
+  border-color: var(--secondary-color);
+}
+
+/* Estilo para guardar los datos de memoria en celdas */
+.ram-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+
+.ram-cell {
+  background: #2d3436;
+  color: #e5eaf1;
+  border: 1px solid #3d566e;
+  padding: 8px;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.ram-cell:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+.cell-address {
+  font-size: 0.7em;
+  color: var(--text-light);
+  margin-bottom: 5px;
+}
+
+.cell-value {
+  font-weight: bold;
+}
+
+.ram-cell input {
+  width: 100%;
+  font-family: 'Fira Code', monospace;
+  text-align: center;
+  border: 1px solid var(--secondary-color);
+  padding: 5px;
+}

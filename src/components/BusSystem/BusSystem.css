@@ -1,0 +1,475 @@
+/* ===== GOOGLE FONT IMPORT (agrega esto en tu HTML) ===== */
+/* <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> */
+
+/* ===== VARIABLES ===== */
+:root {
+  --bus-data: #4286f4;
+  --bus-address: #34a853;
+  --bus-control: #ea4335;
+  --bus-internal: #ffab91;
+
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #34495e;
+  --text-color: #2d3436;
+  --border-color: #dfe6e9;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  --accent-blue: #5fa9f6;
+  --accent-green: #52c279;
+  --accent-red: #f2645e;
+
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ===== GLOBAL ===== */
+body {
+  background-color: #f8f9fa;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== SISTEMA DE BUSES PRINCIPAL ===== */
+.bus-system {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  width: 100%;
+  min-height: 40px;
+  max-height: 800px;
+  gap: 1.2rem;
+  padding: 0.2rem 0.5rem;
+  background: transparent;
+  border-radius: 1rem;
+  box-shadow: none;
+  border: none;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-x: auto;
+  flex: 1 1 100%; /* <-- Asegura que ocupe todo el espacio disponible */
+}
+
+/* Si está dentro de .cpu-bus, fuerza el ancho completo */
+.cpu-bus .bus-system {
+  width: 800vw !important;
+  max-width: 800vw !important;
+  left: 50%;
+  right: 50%;
+  transform: translateX(-50%);
+  position: relative;
+  flex: 1 1 100%;
+  min-width: 0;
+  margin: 0 -2vw;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.bus-system-title {
+  color: var(--primary-color);
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* ===== CONEXIONES ENTRE COMPONENTES ===== */
+.bus-connections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bus-connection {
+  position: relative;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.05), 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.bus-connection:hover {
+  transform: scale(1.015);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+}
+
+.connection-label {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connection-label::before {
+  content: '';
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+
+.data-bus .connection-label::before { background: var(--bus-data); }
+.address-bus .connection-label::before { background: var(--bus-address); }
+.control-bus .connection-label::before { background: var(--bus-control); }
+
+.connection-path {
+  height: 0.25rem;
+  background: var(--light-color);
+  margin: 1rem 0;
+  position: relative;
+  border-radius: 0.125rem;
+  overflow: hidden;
+}
+
+.data-bus .connection-path { background: rgba(66, 134, 244, 0.2); }
+.address-bus .connection-path { background: rgba(52, 168, 83, 0.2); }
+.control-bus .connection-path { background: rgba(234, 67, 53, 0.2); }
+
+.bus-connection.active .connection-path {
+  animation: pulse-bus 1.5s infinite;
+}
+
+.data-flow, .address-flow, .control-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 40%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  animation: flowAnimation 1.5s linear infinite;
+  font-size: 0;
+  color: transparent;
+}
+
+.connection-endpoints {
+  display: flex;
+  justify-content: space-between;
+}
+
+.endpoint {
+  padding: 0.375rem 0.875rem;
+  border-radius: 1rem;
+  background: var(--light-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.endpoint::before {
+  content: '';
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.endpoint.cpu { background: #ffebee; color: #c62828; }
+.endpoint.cpu::before { background: #e53935; }
+
+.endpoint.memory { background: #e8f5e9; color: #2e7d32; }
+.endpoint.memory::before { background: #43a047; }
+
+.endpoint.io { background: #e3f2fd; color: #1565c0; }
+.endpoint.io::before { background: #1e88e5; }
+
+/* ===== COMPONENTES DE BUS ===== */
+.bus-components {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bus-component {
+  flex: 1 1 0;
+  min-width: 120px;
+  max-width: 100%;
+  background: #eaf6fb;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(52,152,219,0.07);
+  border: 1.5px solid #b2bec3;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0 0.3rem;
+}
+
+.bus-component:hover {
+  transform: scale(1.015);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+}
+
+.bus-component::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.25rem;
+}
+
+.data-bus::before { background: var(--bus-data); }
+.address-bus::before { background: var(--bus-address); }
+.control-bus::before { background: var(--bus-control); }
+.internal-bus::before { background: var(--bus-internal); }
+
+.bus-component-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.bus-title {
+  font-weight: 600;
+  color: var(--dark-color);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.bus-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  background: var(--light-color);
+  color: var(--text-color);
+  border: 1px solid transparent;
+}
+
+.bus-component.active .bus-status {
+  background: var(--success-color);
+  color: white;
+  border-color: white;
+}
+
+.bus-value {
+  font-family: 'Fira Code', monospace;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--light-color);
+  border-radius: 0.5rem;
+  word-break: break-all;
+  transition: var(--transition);
+  font-size: 1.1rem;
+  padding: 0.7rem;
+  overflow-x: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.bus-component.active .bus-value {
+  background: var(--primary-color);
+  color: white;
+  border: 1px solid var(--primary-color);
+}
+
+.bus-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.bus-activity {
+  height: 0.25rem;
+  background: var(--light-color);
+  border-radius: 0.125rem;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.activity-indicator {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.data-bus .activity-indicator { background: var(--bus-data); }
+.address-bus .activity-indicator { background: var(--bus-address); }
+.control-bus .activity-indicator { background: var(--bus-control); }
+.internal-bus .activity-indicator { background: var(--bus-internal); }
+
+.bus-component.active .activity-indicator {
+  width: 100%;
+  animation: pulse 1.5s infinite;
+}
+
+/* ===== BUS DE CONTROL: SEÑALES BINARIAS ===== */
+.control-bus .signal-details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.signal-bit {
+  padding: 0.5rem;
+  background: var(--light-color);
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.signal-bit.active {
+  background: var(--bus-control);
+  color: white;
+}
+
+.signal-bit-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* ===== COMPONENTES CONECTADOS ===== */
+.connected-components {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.connected-components-title {
+  font-weight: 600;
+  color: var(--dark-color);
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+}
+
+.component {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--light-color);
+  text-align: center;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.component.active {
+  background: #e8f5e9;
+  box-shadow: 0 0 0 1px var(--success-color);
+}
+
+.component-icon {
+  font-size: 1.5rem;
+}
+
+.component-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.component-status {
+  font-size: 0.7rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes flowAnimation {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse-bus {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .bus-components {
+    grid-template-columns: 1fr;
+  }
+
+  .components-grid {
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  }
+
+  .bus-value {
+    font-size: 1.1rem;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .bus-system {
+    padding: 0.5rem 0.2rem;
+  }
+  .bus-components {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .bus-component {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .bus-system {
+    padding: 0.2rem 0.1rem;
+    border-radius: 0.5rem;
+  }
+  .bus-component {
+    padding: 0.7rem;
+    border-radius: 0.5rem;
+  }
+  .bus-value {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+}

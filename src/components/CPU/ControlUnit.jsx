@@ -1,4 +1,5 @@
 import React from 'react';
+import './cpu.css';
 
 const ControlUnit = ({ currentStep }) => {
   const steps = {

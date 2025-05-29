@@ -23,7 +23,6 @@ const ADDRESS_SIZE = 12;
 
 function App() {
   const [systemState, setSystemState] = useState(initialState);
-  const [viewMode, setViewMode] = useState('instruction');
   const { handleInput, handleOutput } = useCommandHandler(systemState, setSystemState);
   const { executeNextInstruction } = useInstructionCycle(systemState, setSystemState, handleOutput);
 
@@ -45,11 +44,16 @@ function App() {
   };*/
 
   const handleProgramLoad = (programLines) => {
+    const ROM_SIZE = systemState.memory.rom.length;
+    const padded = [
+      ...programLines.map(line => line.padStart(16, '0')),
+      ...Array(ROM_SIZE - programLines.length).fill('0000000000000000')
+    ];
     setSystemState(prev => ({
       ...prev,
       memory: {
         ...prev.memory,
-        rom: programLines // Solo lo ingresado
+        rom: padded
       },
       cpu: {
         ...prev.cpu,
@@ -107,7 +111,6 @@ function App() {
             >
               {systemState.running ? 'Ejecutando...' : 'Ejecutar Auto'}
             </button>
-            <button onClick={() => setViewMode('instruction')}>INST</button>
           </div>
         </div>
 
@@ -141,16 +144,13 @@ function App() {
               memory={systemState.memory.ram} 
               onMemoryChange={updateMemoryState} 
               wordSize={WORD_SIZE}
-              viewMode={viewMode}
             />
           </div>
           <div className="cpu-square-cell cpu-rom">
             <ROM
-              memory={systemState.memory.rom} 
-              onMemoryChange={updateMemoryState} 
+              memory={systemState.memory.rom}
+              onProgramLoad={handleProgramLoad}
               wordSize={WORD_SIZE}
-              onProgramLoad={handleProgramLoad} 
-              viewMode={viewMode}
             />
           </div>
         </div>

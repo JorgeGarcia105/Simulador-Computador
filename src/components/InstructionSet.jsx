@@ -1,8 +1,8 @@
 export const INSTRUCTION_SET = {
-  '0000': { name: 'NOP', description: 'No operation' }, // No operation
-  '0001': { name: 'LOAD', description: 'Load from memory to ACC' }, //cargar de memoria a ACC
-  '0010': { name: 'STORE', description: 'Store ACC to memory' }, // almacenar ACC en memoria
-  '0011': { name: 'ADD', description: 'Add memory to ACC' }, // sumar memoria a ACC
+  '0000': { name: 'NOP', description: 'No operation' },
+  '0001': { name: 'LOAD', description: 'Load from memory to ACC' },
+  '0010': { name: 'STORE', description: 'Store ACC to memory' },
+  '0011': { name: 'ADD', description: 'Add memory to ACC' },
   '0100': { name: 'SUB', description: 'Subtract memory from ACC' },
   '0101': { name: 'JMP', description: 'Jump to address' },
   '0110': { name: 'JZ', description: 'Jump if zero' },
@@ -12,7 +12,10 @@ export const INSTRUCTION_SET = {
   '1010': { name: 'AND', description: 'Logical AND with ACC' },
   '1011': { name: 'OR', description: 'Logical OR with ACC' },
   '1100': { name: 'XOR', description: 'Logical XOR with ACC' },
-  // ... (todas las demás instrucciones)
+  '1101': { name: 'NOT', description: 'Logical NOT of ACC' },
+  '1110': { name: 'SHL', description: 'Shift ACC left' },
+  '1111': { name: 'SHR', description: 'Shift ACC right' },
+  // ...otros si los tienes
 };
 
 const InstructionSet = () => {

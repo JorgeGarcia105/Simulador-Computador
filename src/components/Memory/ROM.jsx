@@ -1,73 +1,80 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import './RAMViewer.css';
 
-const ROM = ({ 
-  memory = [], 
-  wordSize = 16,  // Cambiado a 16 bits para instrucciones
-  currentAddress = null,
-  instructionSet = {} 
+// Opcodes de ejemplo, ajusta según tu InstructionSet real
+const OPCODES = {
+  LOAD: '0001',
+  STORE: '0010',
+  ADD: '0011',
+  SUB: '0100',
+  JMP: '0101',
+  NOP: '0000',
+  HLT: '1111',
+  // ...agrega los que uses
+};
+
+function toBin(num, bits) {
+  return Number(num).toString(2).padStart(bits, '0');
+}
+
+const ROM = ({
+  memory = [], // ROM inicial de initialState.js
+  onProgramLoad, // función para cargar el programa en la ROM real
 }) => {
-  const [viewMode, setViewMode] = useState('hex');
+  const [input, setInput] = useState('');
 
-  // Decodificador de instrucciones
-  const decodeInstruction = (value) => {
-    const num = typeof value === 'string' ? parseInt(value, 2) : value;
-    const binary = num.toString(2).padStart(wordSize, '0');
-    const opcode = binary.slice(0, 4);
-    const operand = binary.slice(4);
-    
-    return {
-      opcode,
-      operand,
-      instruction: instructionSet[opcode] || 'UNKNOWN',
-      address: parseInt(operand, 2)
-    };
+  // Traduce instrucciones tipo LOAD 2 a binario
+  const parseToBinary = (line) => {
+    const [inst, arg] = line.trim().split(/\s+/);
+    const opcode = OPCODES[inst?.toUpperCase()] || '0000';
+    const operand = arg !== undefined ? toBin(arg, 12) : '000000000000';
+    return opcode + operand;
   };
 
-  // Formatear valor con decodificación de instrucciones
-  const formatValue = (value) => {
-    const decoded = decodeInstruction(value);
-    
-    switch(viewMode) {
-      case 'bin':
-        return (
-          <div>
-            <div>{decoded.opcode} {decoded.operand}</div>
-            <div className="instruction-info">
-              {decoded.instruction.name}: {decoded.instruction.description}
-            </div>
-          </div>
-        );
-      case 'hex':
-        return `0x${parseInt(value, 2).toString(16).padStart(4, '0').toUpperCase()}`;
-      case 'instruction':
-        return `${decoded.instruction.name} [${decoded.address}]`;
-      default:
-        return parseInt(value, 2);
-    }
+  // Procesa el texto del usuario
+  const lines = input.split('\n').filter(Boolean);
+  const binProgram = lines.map(parseToBinary);
+
+  // Al hacer click en "Cargar programa", reemplaza la ROM real
+  const handleLoad = () => {
+    if (onProgramLoad) onProgramLoad(binProgram);
   };
 
   return (
     <div className="rom-component">
+      {/* ROM inicial solo referencia */}
       <div className="rom-header">
-        <h3>Memoria ROM ({wordSize}-bits/word)</h3>
-        <div className="view-mode-selector">
-          <button onClick={() => setViewMode('hex')}>HEX</button>
-          <button onClick={() => setViewMode('bin')}>BIN</button>
-          <button onClick={() => setViewMode('instruction')}>INST</button>
-        </div>
+        <h3>Contenido Actual de la ROM</h3>
+      </div>
+      <div className="memory-grid" style={{ marginBottom: 24 }}>
+        {memory.map((bin, i) => (
+          <div key={i} className="memory-cell">
+            <div className="address">{i.toString().padStart(3, '0')}:</div>
+            <div className="value">{bin}</div>
+          </div>
+        ))}
       </div>
 
+      {/* Editor de programa */}
+      <div className="rom-header">
+        <h3>Editor de Programa (ROM)</h3>
+      </div>
+      <textarea
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        rows={8}
+        style={{ width: '100%', fontFamily: 'monospace', fontSize: 16, marginBottom: 12 }}
+        placeholder="Ejemplo:\nLOAD 2\nADD 4\nSTORE 5\nHLT"
+      />
+      <button onClick={handleLoad}>
+        Cargar programa
+      </button>
       <div className="memory-grid">
-        {memory.map((value, address) => (
-          <div 
-            key={address}
-            className={`memory-cell ${address === currentAddress ? 'active' : ''}`}
-          >
-            <div className="address">0x{address.toString(16).padStart(4, '0')}</div>
-            <div className="value">
-              {formatValue(value, address)}
-            </div>
+        {binProgram.map((bin, i) => (
+          <div key={i} className="memory-cell">
+            <div className="address">{i.toString().padStart(3, '0')}:</div>
+            <div className="value">{bin}</div>
           </div>
         ))}
       </div>
@@ -76,10 +83,9 @@ const ROM = ({
 };
 
 ROM.propTypes = {
-  memory: PropTypes.array.isRequired,
+  memory: PropTypes.array,
   wordSize: PropTypes.number,
-  currentAddress: PropTypes.number,
-  instructionSet: PropTypes.object.isRequired
+  onProgramLoad: PropTypes.func,
 };
 
 export default ROM;

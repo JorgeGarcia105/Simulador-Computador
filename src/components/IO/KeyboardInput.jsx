@@ -1,206 +1,106 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const KeyboardInput = ({ onInput, onProgramSubmit, onSaveToMemory, onMemoryRead }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [inputMode, setInputMode] = useState('text');
-  const [inputHistory, setInputHistory] = useState([]);
+const KeyboardInput = ({ onInput, onProgramLoad }) => {
+  const [input, setInput] = useState('');
+  const [mode, setMode] = useState('command'); // 'command' o 'program'
+  const [history, setHistory] = useState([]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!inputValue.trim()) return;
+  // Convierte instrucciones ensamblador a binario
+  const assemblyToBinary = (instruction) => {
+    const parts = instruction.toUpperCase().split(/\s+/);
+    const op = parts[0];
+    const operand = parts[1] || '0';
+
+    const opcodes = {
+      'LOAD': '0001',
+      'STORE': '0010',
+      'ADD': '0011',
+      'SUB': '0100',
+      'JMP': '0101',
+      'JZ': '0110',
+      'HLT': '1111'
+    };
+
+    const opcode = opcodes[op] || '0000';
+    const operandBinary = parseInt(operand, 10).toString(2).padStart(4, '0');
+    return opcode + operandBinary;
+  };
+
+  // Maneja el envío de instrucciones
+  const handleSubmit = () => {
+    if (!input.trim()) return;
 
     let output;
-    let programOutput = null;
-    let commandData = null;
+    let binaryData;
 
-    switch (inputMode) {
-      case 'number':
-        output = `Número ingresado: ${inputValue}`;
-        break;
-
-      case 'hex':
-        if (/^0x[0-9A-Fa-f]+$/.test(inputValue)) {
-          const decimalValue = parseInt(inputValue, 16);
-          output = `Hexadecimal ${inputValue} = Decimal ${decimalValue}`;
-        } else {
-          output = `Formato hexadecimal inválido. Use 0x seguido de dígitos (0-9, A-F)`;
-        }
-        break;
-
-      case 'program': {
-        const instructions = inputValue.split('\n').filter(line => line.trim());
-        if (instructions.every(validateInstruction)) {
-          output = `Programa recibido (${instructions.length} instrucciones)`;
-          programOutput = instructions;
-        } else {
-          output = `Error en el programa. Instrucciones válidas: LOAD, ADD, SUB, STORE, JMP, JZ, HLT`;
-        }
-        break;
+    if (mode === 'program') {
+      const instructions = input.split('\n').filter(line => line.trim());
+      const binaryProgram = instructions.map(assemblyToBinary);
+      onProgramLoad(binaryProgram); // Enviar el programa a la ROM
+      output = `Programa cargado (${instructions.length} instrucciones)`;
+    } else {
+      if (input.startsWith('0b')) {
+        binaryData = input.slice(2);
+      } else if (/^[0-9A-F]+$/.test(input)) {
+        binaryData = parseInt(input, 16).toString(2).padStart(8, '0');
+      } else if (input === 'run') {
+        onInput('execute');
+        output = 'Ejecutando programa...';
+      } else if (input.startsWith('mem ')) {
+        const address = parseInt(input.split(' ')[1], 10);
+        onInput(`mem ${address}`);
+        return;
+      } else {
+        binaryData = assemblyToBinary(input);
       }
 
-      default: // text mode - procesar comandos
-        if (inputValue.toLowerCase() === 'help') {
-          output = `Comandos disponibles:
-          - save [dir] [valor]: Guarda valor en memoria (ej: save 5 10101010)
-          - mem [dir]: Muestra contenido de memoria
-          - reg: Muestra registros
-          - run: Ejecuta programa
-          - step: Ejecuta paso a paso
-          - reset: Reinicia el simulador`;
-        } 
-        else if (inputValue.startsWith('save ')) {
-          const saveMatch = inputValue.match(/^save\s+(\d+)\s+([01]+|\d+|0x[0-9A-Fa-f]+)$/i);
-          if (saveMatch) {
-            commandData = {
-              type: 'save',
-              address: saveMatch[1],
-              value: saveMatch[2]
-            };
-            output = `Procesando comando: guardar ${saveMatch[2]} en dirección ${saveMatch[1]}`;
-          } else {
-            output = `Formato inválido. Use: save [dirección] [valor] (ej: save 5 10101010)`;
-          }
-        }
-        else if (inputValue.startsWith('mem ')) {
-          const memMatch = inputValue.match(/^mem\s+(\d+)$/);
-          if (memMatch) {
-            commandData = {
-              type: 'mem',
-              address: memMatch[1]
-            };
-            output = `Solicitando contenido de memoria en dirección ${memMatch[1]}`;
-          } else {
-            output = `Formato inválido. Use: mem [dirección]`;
-          }
-        }
-        else {
-          output = `Entrada recibida: ${inputValue}`;
-        }
+      if (binaryData) {
+        onInput(binaryData); // Envía la instrucción a la CPU
+        output = `Instrucción: ${binaryData}`;
+      }
     }
 
-    // Agregar a historial
-    setInputHistory(prev => [
-      { 
-        input: inputValue, 
-        output, 
-        timestamp: new Date().toLocaleTimeString(), 
-        mode: inputMode 
-      },
-      ...prev.slice(0, 9) // Mantener máximo 10 elementos en historial
+    // Actualiza el historial de comandos
+    setHistory(prev => [
+      { input, output, timestamp: new Date().toLocaleTimeString() },
+      ...prev.slice(0, 9)
     ]);
-
-    // Procesar comandos especiales
-    if (commandData) {
-      switch(commandData.type) {
-        case 'save':
-          if (onSaveToMemory) onSaveToMemory(commandData.address, commandData.value);
-          break;
-        case 'mem':
-          if (onMemoryRead) onMemoryRead(commandData.address);
-          break;
-      }
-    } 
-    else if (programOutput && onProgramSubmit) {
-      onProgramSubmit(programOutput);
-    } 
-    else {
-      onInput(output);
-    }
-
-    setInputValue('');
-  };
-
-  const validateInstruction = (line) => {
-    const parts = line.trim().split(/\s+/);
-    const op = parts[0].toUpperCase();
-    const validOps = ['LOAD', 'ADD', 'SUB', 'STORE', 'JMP', 'JZ', 'HLT'];
-    
-    if (!validOps.includes(op)) return false;
-    
-    // Validar operandos según la instrucción
-    switch(op) {
-      case 'HLT':
-        return parts.length === 1;
-      default:
-        return parts.length === 2 && 
-               (parts[1].startsWith('0x') ? /^0x[0-9A-Fa-f]+$/.test(parts[1]) : !isNaN(parts[1]));
-    }
-  };
-
-  const handleModeChange = (mode) => {
-    setInputMode(mode);
-    setInputValue('');
+    setInput('');
   };
 
   return (
     <div className="keyboard-component">
-      <h3>Entrada por Teclado</h3>
-      
+      <h3>Teclado del Computador</h3>
       <div className="mode-selector">
         <button 
-          className={inputMode === 'text' ? 'active' : ''}
-          onClick={() => handleModeChange('text')}
+          className={mode === 'command' ? 'active' : ''} 
+          onClick={() => setMode('command')}
         >
-          Texto
+          Comandos
         </button>
         <button 
-          className={inputMode === 'number' ? 'active' : ''}
-          onClick={() => handleModeChange('number')}
+          className={mode === 'program' ? 'active' : ''} 
+          onClick={() => setMode('program')}
         >
-          Número
-        </button>
-        <button 
-          className={inputMode === 'hex' ? 'active' : ''}
-          onClick={() => handleModeChange('hex')}
-        >
-          Hexadecimal
-        </button>
-        <button 
-          className={inputMode === 'program' ? 'active' : ''}
-          onClick={() => handleModeChange('program')}
-        >
-          Programa
+          Cargar Programa
         </button>
       </div>
-
-      <form onSubmit={handleSubmit}>
-        {inputMode === 'program' ? (
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={`Ejemplo:\nLOAD 0x01\nADD 0x02\nSTORE 0x03\nHLT`}
-            rows={5}
-          />
-        ) : (
-          <input
-            type={inputMode === 'number' ? 'number' : 'text'}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={
-              inputMode === 'text' ? 'Escribe texto o comandos...' :
-              inputMode === 'number' ? 'Ingresa número decimal...' :
-              inputMode === 'hex' ? 'Ingresa valor hexadecimal (0x...)':
-              'Escribe instrucciones...'
-            }
-          />
-        )}
-        
-        <button type="submit">Enviar</button>
-      </form>
-
-      <div className="input-history">
-        <h4>Historial:</h4>
-        <ul>
-          {inputHistory.map((item, index) => (
-            <li key={index} className={`history-item ${item.mode}`}>
-              <span className="timestamp">{item.timestamp}:</span>
-              <span className="input">{item.input}</span>
-              {item.output && <div className="output">{item.output}</div>}
-            </li>
-          ))}
-        </ul>
+      
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder={mode === 'command' ? 'Introduce una instrucción...' : 'Introduce instrucciones del programa...'}
+        rows={6}
+      />
+      <button onClick={handleSubmit}>Enviar</button>
+      
+      <div className="history">
+        {history.map((item, index) => (
+          <div key={index} className="history-item">
+            <p>{item.timestamp}: <strong>{item.input}</strong> - {item.output}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -208,9 +108,7 @@ const KeyboardInput = ({ onInput, onProgramSubmit, onSaveToMemory, onMemoryRead 
 
 KeyboardInput.propTypes = {
   onInput: PropTypes.func.isRequired,
-  onProgramSubmit: PropTypes.func,
-  onSaveToMemory: PropTypes.func,
-  onMemoryRead: PropTypes.func
+  onProgramLoad: PropTypes.func.isRequired
 };
 
 export default KeyboardInput;

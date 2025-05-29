@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types'
 
 const AddressBus = ({ value, active }) => {
+  // Muestra el valor en binario, con padding según el tamaño del bus
+  const binValue = value
+    ? value.padStart(12, '0') // Ajusta 12 si tu bus es de otro tamaño
+    : '---';
+
   return (
     <div className={`bus address-bus ${active ? 'active' : ''}`}>
       <h4>Bus de Direcciones</h4>
       <div className="bus-value">
-        {value !== null ? `0x${value.toString(16).padStart(2, '0').toUpperCase()}` : '---'}
+        {binValue}
       </div>
       <div className="bus-animation"></div>
     </div>
@@ -13,7 +18,7 @@ const AddressBus = ({ value, active }) => {
 }
 
 AddressBus.propTypes = {
-  value: PropTypes.number,
+  value: PropTypes.string, // String binario
   active: PropTypes.bool
 }
 

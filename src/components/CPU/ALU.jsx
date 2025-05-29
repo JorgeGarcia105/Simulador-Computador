@@ -1,6 +1,17 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { binaryToDec, decToHex } from '../../utils/binaryUtils'; // Utilidades de conversión
+import { 
+  binaryToDec, 
+  binaryAdd,
+  binarySubtract,
+  binaryAnd,
+  binaryOr,
+  binaryXor,
+  binaryNot,
+  binaryShiftLeft,
+  binaryShiftRight
+} from '../../utils/binaryUtils';
+import './cpu.css';
 
 const ALU = ({
   operation = 'NOP',
@@ -8,135 +19,92 @@ const ALU = ({
   operandB = '00000000',
   flags = {},
   onResult,
-  wordSize = 8
+  wordSize = 12
 }) => {
-  const MAX_VALUE = Math.pow(2, wordSize) - 1;
-
-  // Funciones internas de conversión
-  const toBinary = (value) => (value >>> 0).toString(2).padStart(wordSize, '0');
-  const fromBinary = (binaryStr) => parseInt(binaryStr, 2);
-
-  // Operaciones disponibles
+  // Operaciones disponibles (puramente binarias)
   const operations = {
     ADD: (a, b) => {
-      const numA = fromBinary(a); 
-      const numB = fromBinary(b);
-      const result = numA + numB;
-
-      console.log(`ADD: ${numA} ${operation} ${numB} = ${result}`); // Log para depurar
-      // Si el resultado es mayor que el máximo valor, se ajusta al tamaño de palabra
-      if (result > MAX_VALUE) {
-        console.warn(`Resultado excede el valor máximo (${MAX_VALUE}). Ajustando...`);
-      }
-
-      return {
-        result: toBinary(result & MAX_VALUE), // Asegurarse de que el resultado esté dentro del rango
-        flags: {
-          Z: (result & MAX_VALUE) === 0 ? '1' : '0', // Flag de cero
-          C: result > MAX_VALUE ? '1' : '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
-          O: ((numA & (1 << (wordSize - 1))) === (numB & (1 << (wordSize - 1)))) &&
-             ((result & (1 << (wordSize - 1))) !== (numA & (1 << (wordSize - 1)))) ? '1' : '0'
-        }
-      };
+      const { result, flags } = binaryAdd(a, b, wordSize);
+      return { result, flags };
     },
     SUB: (a, b) => {
-      const numA = fromBinary(a);
-      const numB = fromBinary(b);
-      const result = numA - numB;
-      console.log(`SUB: ${numA} - ${numB} = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result & MAX_VALUE),
-        flags: {
-          Z: (result & MAX_VALUE) === 0 ? '1' : '0',
-          C: result < 0 ? '1' : '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
-          O: ((numA & (1 << (wordSize - 1))) !== (numB & (1 << (wordSize - 1)))) &&
-             ((result & (1 << (wordSize - 1))) !== (numA & (1 << (wordSize - 1)))) ? '1' : '0'
-        }
-      };
+      const { result, flags } = binarySubtract(a, b, wordSize);
+      return { result, flags };
     },
     AND: (a, b) => {
-      const result = fromBinary(a) & fromBinary(b);
-      console.log(`AND: ${a} & ${b} = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const result = binaryAnd(a, b, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
           C: '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
+          S: result[0] === '1' ? '1' : '0',
           O: '0'
         }
       };
     },
     OR: (a, b) => {
-      const result = fromBinary(a) | fromBinary(b);
-      console.log(`OR: ${a} | ${b} = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const result = binaryOr(a, b, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
           C: '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
+          S: result[0] === '1' ? '1' : '0',
           O: '0'
         }
       };
     },
     XOR: (a, b) => {
-      const result = fromBinary(a) ^ fromBinary(b);
-      console.log(`XOR: ${a} ^ ${b} = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const result = binaryXor(a, b, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
           C: '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
+          S: result[0] === '1' ? '1' : '0',
           O: '0'
         }
       };
     },
     NOT: (a) => {
-      const result = ~fromBinary(a) & MAX_VALUE;
-      console.log(`NOT: ~${a} = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const result = binaryNot(a, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
           C: '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
+          S: result[0] === '1' ? '1' : '0',
           O: '0'
         }
       };
     },
     SHL: (a) => {
-      const numA = fromBinary(a);
-      const result = (numA << 1) & MAX_VALUE;
-      console.log(`SHL: ${a} << 1 = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const { result, carry } = binaryShiftLeft(a, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
-          C: (numA & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
-          S: (result & (1 << (wordSize - 1))) !== 0 ? '1' : '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
+          C: carry,
+          S: result[0] === '1' ? '1' : '0',
           O: '0'
         }
       };
     },
     SHR: (a) => {
-      const numA = fromBinary(a);
-      const result = numA >> 1;
-      console.log(`SHR: ${a} >> 1 = ${result}`); // Log para depurar
-      return {
-        result: toBinary(result),
+      const { result, carry } = binaryShiftRight(a, wordSize);
+      return { 
+        result,
         flags: {
-          Z: result === 0 ? '1' : '0',
-          C: (numA & 0x1) !== 0 ? '1' : '0',
-          S: '0',
+          Z: result === '0'.repeat(wordSize) ? '1' : '0',
+          C: carry,
+          S: '0', // Right shift can't produce negative numbers
           O: '0'
         }
       };
     }
   };
+
   useEffect(() => {
     if (!operation || !operations[operation]) {
       console.log("Operación inválida o vacía. No se ejecuta nada.");
@@ -144,16 +112,27 @@ const ALU = ({
     }
   
     console.log(`Ejecutando operación: ${operation} con operandos A: ${operandA}, B: ${operandB}`);
-    const { result, flags } = operations[operation](operandA, operandB);
-    console.log(`Resultado de la operación: ${result}`);
-    console.log(`Flags: ${JSON.stringify(flags)}`);
+    
+    let result;
+    try {
+      result = operations[operation](
+        operandA, 
+        operation === 'NOT' || operation === 'SHL' || operation === 'SHR' ? null : operandB
+      );
+    } catch (error) {
+      console.error(`Error en ALU: ${error.message}`);
+      return;
+    }
+    
+    console.log(`Resultado de la operación: ${result.result}`);
+    console.log(`Flags: ${JSON.stringify(result.flags)}`);
   
     if (onResult) {
-      onResult({ result, flags });
+      onResult(result);
     }
   }, [operation, operandA, operandB, wordSize, onResult]);
-  
 
+  // Display values (converted only for display purposes)
   const aDec = binaryToDec(operandA, wordSize);
   const bDec = binaryToDec(operandB, wordSize);
 
@@ -166,23 +145,23 @@ const ALU = ({
           <label>Operando A:</label>
           <div className="value binary">{operandA}</div>
           <div className="value decimal">{aDec}</div>
-          <div className="value hexadecimal">{decToHex(aDec, wordSize)}</div>
         </div>
 
         <div className="operation-display">
           <h4>{operation || 'NOP'}</h4>
         </div>
 
-        <div className="operand">
-          <label>Operando B:</label>
-          <div className="value binary">{operandB}</div>
-          <div className="value decimal">{bDec}</div>
-          <div className="value hexadecimal">{decToHex(bDec, wordSize)}</div>
-        </div>
+        {operation !== 'NOT' && operation !== 'SHL' && operation !== 'SHR' && (
+          <div className="operand">
+            <label>Operando B:</label>
+            <div className="value binary">{operandB}</div>
+            <div className="value decimal">{bDec}</div>
+          </div>
+        )}
       </div>
 
-      <div className="alu-operation">
-        Operación: {operation || 'NINGUNA'}
+      <div>
+        <strong>Operación:</strong> {operation || 'Ninguna'}
       </div>
 
       <div className="alu-flags">
@@ -196,6 +175,46 @@ const ALU = ({
           ))}
         </div>
       </div>
+      
+      {/* Explicación de los flags 
+      /*
+      ==========================
+      EXPLICACIÓN DE LOS FLAGS
+      ==========================
+      Los "flags" son indicadores que la ALU activa automáticamente después de cada operación para informar sobre el resultado. Son útiles para tomar decisiones en el flujo del programa (por ejemplo, saltar si el resultado es cero o negativo).
+
+      - Z (Zero): Se activa (1) si el resultado es cero. Sirve para saber si una operación produjo un resultado nulo.
+      - C (Carry): Se activa si hubo acarreo (overflow) en suma/resta o si se desplazó un bit fuera en SHL/SHR.
+      - S (Sign): Se activa si el resultado es negativo (en complemento a dos, es decir, si el bit más significativo es 1).
+      - O (Overflow): Se activa si hubo desbordamiento aritmético (por ejemplo, suma de dos positivos da negativo).
+
+      ¿Por qué existen?
+      Los flags permiten que el procesador tome decisiones automáticas tras una operación, como saltar a otra instrucción si el resultado fue cero, negativo o hubo acarreo.
+
+      ¿Cuándo se activan?
+      Se actualizan automáticamente después de cada operación aritmética o lógica, según el resultado obtenido.
+      ==========================
+      <div className="alu-flags-explanation" style={{marginTop: 16, fontSize: '0.95em', background: '#f8f8f8', padding: 12, borderRadius: 8}}>
+        <h4>¿Qué son los flags?</h4>
+        <p>
+          Los <strong>flags</strong> son indicadores que la ALU activa automáticamente después de cada operación para informar sobre el resultado. Son útiles para tomar decisiones en el flujo del programa (por ejemplo, saltar si el resultado es cero o negativo).
+        </p>
+        <ul>
+          <li><strong>Z (Zero):</strong> Se activa (<b>1</b>) si el resultado es <b>cero</b>. Sirve para saber si una operación produjo un resultado nulo.</li>
+          <li><strong>C (Carry):</strong> Se activa si hubo <b>acarreo</b> (overflow) en suma/resta o si se desplazó un bit fuera en SHL/SHR.</li>
+          <li><strong>S (Sign):</strong> Se activa si el resultado es <b>negativo</b> (en complemento a dos, es decir, si el bit más significativo es 1).</li>
+          <li><strong>O (Overflow):</strong> Se activa si hubo <b>desbordamiento aritmético</b> (por ejemplo, suma de dos positivos da negativo).</li>
+        </ul>
+        <p>
+          <b>¿Por qué existen?</b> Los flags permiten que el procesador tome decisiones automáticas tras una operación, como saltar a otra instrucción si el resultado fue cero, negativo o hubo acarreo.
+        </p>
+        <p>
+          <b>¿Cuándo se activan?</b> Se actualizan automáticamente después de cada operación aritmética o lógica, según el resultado obtenido.
+        </p>
+      </div>
+      ==========================
+      */}
+      
 
       <div className="alu-info">
         <p>Operaciones soportadas: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR</p>
