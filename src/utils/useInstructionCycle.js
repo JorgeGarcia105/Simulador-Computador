@@ -137,8 +137,9 @@ const useInstructionCycle = (systemState, setSystemState, handleOutput) => {
 			// Verificar fin del programa
 			if (pcNum >= systemState.memory.rom.length) {
 				handleOutput('text', 'Fin del programa (PC fuera de ROM)');
+				alert('¡El programa ha terminado de ejecutarse!');
 				setSystemState((prev) => ({ ...prev, running: false }));
-				return;
+				return false;
 			}
 
 			const instruction = normalizeBinary(
@@ -339,6 +340,7 @@ const useInstructionCycle = (systemState, setSystemState, handleOutput) => {
 
 						case '0101': // HLT
 							handleOutput('text', 'Programa detenido (HLT)');
+							alert('¡El programa ha terminado de ejecutarse!');
 							setSystemState((prev) => ({ ...prev, running: false }));
 							incrementarPC = false;
 							return;

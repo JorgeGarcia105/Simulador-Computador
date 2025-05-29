@@ -3,12 +3,9 @@ import ALU from './components/CPU/ALU';
 import Registers from './components/CPU/Registers';
 import RAM from './components/Memory/RAM';
 import ROM from './components/Memory/ROM';
-import BusSystem from './components/BusSystem/BusSystem.jsx';
 import DataBus from './components/BusSystem/DataBus';
 import AddressBus from './components/BusSystem/AddressBus';
 import ControlBus from './components/BusSystem/ControlBus';
-import KeyboardInput from './components/IO/KeyboardInput';
-import ScreenOutput from './components/IO/ScreenOutput';
 import InstructionSet from './components/InstructionSet';
 import { initialState } from './utils/initialState.js';
 import { useCommandHandler } from './hooks/useCommandHandler';
@@ -16,15 +13,13 @@ import { toBinary } from './utils/binaryUtils';
 import useInstructionCycle from './utils/useInstructionCycle.js';
 import { updateMemory } from './utils/MemoryHandler';
 import InternalBus from './components/CPU/InternalBus';
-import BusAnimation from './components/BusSystem/BusAnimation.jsx';
-//, handleSaveToMemory, handleMemoryRead
 const WORD_SIZE = 12;
 const ADDRESS_SIZE = 12;
 
 function App() {
 	const [systemState, setSystemState] = useState(initialState);
-	const [viewMode, setViewMode] = useState('instruction');
-	const { handleInput, handleOutput } = useCommandHandler(systemState, setSystemState);
+	const [viewMode] = useState('instruction');
+	const { handleOutput } = useCommandHandler(systemState, setSystemState);
 	const { executeNextInstruction } = useInstructionCycle(
 		systemState,
 		setSystemState,
@@ -77,6 +72,7 @@ function App() {
 				timeoutId = setTimeout(runAuto, 1000 / systemState.speed);
 			} else {
 				// Detén la ejecución automática si el programa terminó
+				alert('¡El programa ha terminado de ejecutarse!');
 				setSystemState((prev) => ({ ...prev, running: false }));
 			}
 		}
@@ -131,7 +127,6 @@ function App() {
 						>
 							{systemState.running ? 'Ejecutando...' : 'Ejecutar Auto'}
 						</button>
-						<button onClick={() => setViewMode('instruction')}>INST</button>
 					</div>
 				</div>
 
