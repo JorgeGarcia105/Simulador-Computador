@@ -35,6 +35,10 @@ body {
 	min-height: 100vh;
 }
 
+h5 {
+	color: black;
+}
+
 /* ===== ESTILOS DEL SIMULADOR ===== */
 .computer-simulator {
 	background: var(--background-gradient);
@@ -191,7 +195,7 @@ h3 {
 }
 
 h4 {
-	color: var(--dark-color);
+	color: white;
 	margin: 15px 0;
 	font-size: 1.1rem;
 }
@@ -243,6 +247,7 @@ h4 {
 .instruction-set table {
 	width: 100%;
 	border-collapse: collapse;
+	color: black;
 }
 
 .instruction-set th,
@@ -254,7 +259,7 @@ h4 {
 
 .instruction-set th {
 	background-color: #f8f9fa;
-	color: var(--dark-color);
+	color: black;
 	font-weight: 600;
 }
 
@@ -268,6 +273,13 @@ h4 {
 	color: var(--primary-color);
 }
 
+.instruction-set {
+	color: black;
+}
+
+.bottom-block {
+	color: black;
+}
 .instruction-section {
 	flex: 2 1 0;
 	max-height: 320px;
