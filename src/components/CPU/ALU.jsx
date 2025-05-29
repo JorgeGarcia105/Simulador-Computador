@@ -1,182 +1,186 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  binaryToDec, 
-  binaryAdd,
-  binarySubtract,
-  binaryAnd,
-  binaryOr,
-  binaryXor,
-  binaryNot,
-  binaryShiftLeft,
-  binaryShiftRight
+import {
+	binaryToDec,
+	binaryAdd,
+	binarySubtract,
+	binaryAnd,
+	binaryOr,
+	binaryXor,
+	binaryNot,
+	binaryShiftLeft,
+	binaryShiftRight,
 } from '../../utils/binaryUtils';
 import './cpu.css';
 
 const ALU = ({
-  operation = 'NOP',
-  operandA = '00000000',
-  operandB = '00000000',
-  flags = {},
-  onResult,
-  wordSize = 12
+	operation = 'NOP',
+	operandA = '00000000',
+	operandB = '00000000',
+	flags = {},
+	onResult,
+	wordSize = 12,
 }) => {
-  // Operaciones disponibles (puramente binarias)
-  const operations = {
-    ADD: (a, b) => {
-      const { result, flags } = binaryAdd(a, b, wordSize);
-      return { result, flags };
-    },
-    SUB: (a, b) => {
-      const { result, flags } = binarySubtract(a, b, wordSize);
-      return { result, flags };
-    },
-    AND: (a, b) => {
-      const result = binaryAnd(a, b, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: '0',
-          S: result[0] === '1' ? '1' : '0',
-          O: '0'
-        }
-      };
-    },
-    OR: (a, b) => {
-      const result = binaryOr(a, b, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: '0',
-          S: result[0] === '1' ? '1' : '0',
-          O: '0'
-        }
-      };
-    },
-    XOR: (a, b) => {
-      const result = binaryXor(a, b, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: '0',
-          S: result[0] === '1' ? '1' : '0',
-          O: '0'
-        }
-      };
-    },
-    NOT: (a) => {
-      const result = binaryNot(a, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: '0',
-          S: result[0] === '1' ? '1' : '0',
-          O: '0'
-        }
-      };
-    },
-    SHL: (a) => {
-      const { result, carry } = binaryShiftLeft(a, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: carry,
-          S: result[0] === '1' ? '1' : '0',
-          O: '0'
-        }
-      };
-    },
-    SHR: (a) => {
-      const { result, carry } = binaryShiftRight(a, wordSize);
-      return { 
-        result,
-        flags: {
-          Z: result === '0'.repeat(wordSize) ? '1' : '0',
-          C: carry,
-          S: '0', // Right shift can't produce negative numbers
-          O: '0'
-        }
-      };
-    }
-  };
+	// Operaciones disponibles (puramente binarias)
+	const operations = {
+		ADD: (a, b) => {
+			const { result, flags } = binaryAdd(a, b, wordSize);
+			return { result, flags };
+		},
+		SUB: (a, b) => {
+			const { result, flags } = binarySubtract(a, b, wordSize);
+			return { result, flags };
+		},
+		AND: (a, b) => {
+			const result = binaryAnd(a, b, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: '0',
+					S: result[0] === '1' ? '1' : '0',
+					O: '0',
+				},
+			};
+		},
+		OR: (a, b) => {
+			const result = binaryOr(a, b, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: '0',
+					S: result[0] === '1' ? '1' : '0',
+					O: '0',
+				},
+			};
+		},
+		XOR: (a, b) => {
+			const result = binaryXor(a, b, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: '0',
+					S: result[0] === '1' ? '1' : '0',
+					O: '0',
+				},
+			};
+		},
+		NOT: (a) => {
+			const result = binaryNot(a, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: '0',
+					S: result[0] === '1' ? '1' : '0',
+					O: '0',
+				},
+			};
+		},
+		SHL: (a) => {
+			const { result, carry } = binaryShiftLeft(a, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: carry,
+					S: result[0] === '1' ? '1' : '0',
+					O: '0',
+				},
+			};
+		},
+		SHR: (a) => {
+			const { result, carry } = binaryShiftRight(a, wordSize);
+			return {
+				result,
+				flags: {
+					Z: result === '0'.repeat(wordSize) ? '1' : '0',
+					C: carry,
+					S: '0', // Right shift can't produce negative numbers
+					O: '0',
+				},
+			};
+		},
+	};
 
-  useEffect(() => {
-    if (!operation || !operations[operation]) {
-      console.log("Operación inválida o vacía. No se ejecuta nada.");
-      return;
-    }
-  
-    console.log(`Ejecutando operación: ${operation} con operandos A: ${operandA}, B: ${operandB}`);
-    
-    let result;
-    try {
-      result = operations[operation](
-        operandA, 
-        operation === 'NOT' || operation === 'SHL' || operation === 'SHR' ? null : operandB
-      );
-    } catch (error) {
-      console.error(`Error en ALU: ${error.message}`);
-      return;
-    }
-    
-    console.log(`Resultado de la operación: ${result.result}`);
-    console.log(`Flags: ${JSON.stringify(result.flags)}`);
-  
-    if (onResult) {
-      onResult(result);
-    }
-  }, [operation, operandA, operandB, wordSize, onResult]);
+	useEffect(() => {
+		if (!operation || !operations[operation]) {
+			console.log('Operación inválida o vacía. No se ejecuta nada.');
+			return;
+		}
 
-  // Display values (converted only for display purposes)
-  const aDec = binaryToDec(operandA, wordSize);
-  const bDec = binaryToDec(operandB, wordSize);
+		console.log(
+			`Ejecutando operación: ${operation} con operandos A: ${operandA}, B: ${operandB}`
+		);
 
-  return (
-    <div className="alu-component">
-      <h3>🔢 ALU ({wordSize}-bits)</h3>
+		let result;
+		try {
+			result = operations[operation](
+				operandA,
+				operation === 'NOT' || operation === 'SHL' || operation === 'SHR'
+					? null
+					: operandB
+			);
+		} catch (error) {
+			console.error(`Error en ALU: ${error.message}`);
+			return;
+		}
 
-      <div className="alu-inputs">
-        <div className="operand">
-          <label>Operando A:</label>
-          <div className="value binary">{operandA}</div>
-          <div className="value decimal">{aDec}</div>
-        </div>
+		console.log(`Resultado de la operación: ${result.result}`);
+		console.log(`Flags: ${JSON.stringify(result.flags)}`);
 
-        <div className="operation-display">
-          <h4>{operation || 'NOP'}</h4>
-        </div>
+		if (onResult) {
+			onResult(result);
+		}
+	}, [operation, operandA, operandB, wordSize, onResult]);
 
-        {operation !== 'NOT' && operation !== 'SHL' && operation !== 'SHR' && (
-          <div className="operand">
-            <label>Operando B:</label>
-            <div className="value binary">{operandB}</div>
-            <div className="value decimal">{bDec}</div>
-          </div>
-        )}
-      </div>
+	// Display values (converted only for display purposes)
+	const aDec = binaryToDec(operandA, wordSize);
+	const bDec = binaryToDec(operandB, wordSize);
 
-      <div>
-        <strong>Operación:</strong> {operation || 'Ninguna'}
-      </div>
+	return (
+		<div className="alu-component">
+			<h3>🔢 ALU ({wordSize}-bits)</h3>
 
-      <div className="alu-flags">
-        <h4>🚩 Flags de Estado</h4>
-        <div className="flags-grid">
-          {['Z', 'C', 'S', 'O'].map((flag) => (
-            <div key={flag} className={`flag ${flags[flag] === '1' ? 'active' : ''}`}>
-              <span className="flag-name">{flag}</span>
-              <span className="flag-value">{flags[flag] || '0'}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Explicación de los flags 
+			<div className="alu-inputs">
+				<div className="operand">
+					<label>Operando A:</label>
+					<div className="value binary">{operandA}</div>
+					<div className="value decimal">{aDec}</div>
+				</div>
+
+				<div className="operation-display">
+					<h5>{operation || 'NOP'}</h5>
+				</div>
+
+				{operation !== 'NOT' && operation !== 'SHL' && operation !== 'SHR' && (
+					<div className="operand">
+						<label>Operando B:</label>
+						<div className="value binary">{operandB}</div>
+						<div className="value decimal">{bDec}</div>
+					</div>
+				)}
+			</div>
+
+			<div>
+				<strong>Operación:</strong> {operation || 'Ninguna'}
+			</div>
+
+			<div className="alu-flags">
+				<h4>🚩 Flags de Estado</h4>
+				<div className="flags-grid">
+					{['Z', 'C', 'S', 'O'].map((flag) => (
+						<div key={flag} className={`flag ${flags[flag] === '1' ? 'active' : ''}`}>
+							<span className="flag-name">{flag}</span>
+							<span className="flag-value">{flags[flag] || '0'}</span>
+						</div>
+					))}
+				</div>
+			</div>
+
+			{/* Explicación de los flags 
       /*
       ==========================
       EXPLICACIÓN DE LOS FLAGS
@@ -214,27 +218,26 @@ const ALU = ({
       </div>
       ==========================
       */}
-      
 
-      <div className="alu-info">
-        <p>Operaciones soportadas: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR</p>
-      </div>
-    </div>
-  );
+			<div className="alu-info">
+				<p>Operaciones soportadas: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR</p>
+			</div>
+		</div>
+	);
 };
 
 ALU.propTypes = {
-  operation: PropTypes.string,
-  operandA: PropTypes.string,
-  operandB: PropTypes.string,
-  flags: PropTypes.shape({
-    Z: PropTypes.string,
-    C: PropTypes.string,
-    S: PropTypes.string,
-    O: PropTypes.string
-  }),
-  onResult: PropTypes.func,
-  wordSize: PropTypes.number
+	operation: PropTypes.string,
+	operandA: PropTypes.string,
+	operandB: PropTypes.string,
+	flags: PropTypes.shape({
+		Z: PropTypes.string,
+		C: PropTypes.string,
+		S: PropTypes.string,
+		O: PropTypes.string,
+	}),
+	onResult: PropTypes.func,
+	wordSize: PropTypes.number,
 };
 
 export default ALU;
