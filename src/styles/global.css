@@ -46,8 +46,6 @@ h5 {
 	flex-direction: column;
 	align-items: stretch;
 	max-width: 1600px;
-	margin: 0 auto;
-	gap: 18px;
 }
 
 .component {
@@ -295,81 +293,6 @@ h4 {
 	margin: 30px;
 }
 
-/* ===== SIMULATOR DRAWER (CAJÓN) ===== */
-.simulator-drawer {
-	background: var(--background-gradient);
-	position: relative;
-	filter: drop-shadow(0 8px 32px #23272e33);
-}
-
-.simulator-drawer .pc-leg-right {
-	content: '';
-	position: absolute;
-	right: 8%;
-	bottom: -38px;
-	width: 12%;
-	height: 18px;
-	background: var(--primary-color);
-	border-radius: 0 0 16px 16px;
-	box-shadow: 0 4px 12px #23272e99;
-	z-index: 2;
-	pointer-events: none;
-}
-.simulator-drawer .ventilation {
-	position: absolute;
-	top: 18px;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 120px;
-	height: 12px;
-	background: repeating-linear-gradient(90deg, #b2bec3 0 10px, #e4e8eb 10px 20px);
-	border-radius: 8px;
-	opacity: 0.5;
-	z-index: 10;
-	pointer-events: none;
-}
-.simulator-drawer .power-btn {
-	position: absolute;
-	top: 22px;
-	right: 38px;
-	width: 22px;
-	height: 22px;
-	background: radial-gradient(circle at 60% 40%, #27ae60 70%, #23272e 100%);
-	border: 2px solid #b2bec3;
-	border-radius: 50%;
-	box-shadow: 0 2px 8px #27ae6033;
-	z-index: 10;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-.simulator-drawer .power-btn::after {
-	content: '';
-	display: block;
-	width: 8px;
-	height: 8px;
-	background: #fff;
-	border-radius: 50%;
-	opacity: 0.7;
-}
-.simulator-drawer .ports {
-	position: absolute;
-	bottom: 12px;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	gap: 18px;
-	z-index: 10;
-}
-.simulator-drawer .port {
-	width: 18px;
-	height: 8px;
-	background: #b2bec3;
-	border-radius: 3px;
-	box-shadow: 0 1px 2px #23272e44;
-	opacity: 0.7;
-}
-
 /* ALU + REGISTROS agrupados */
 .cpu-block {
 	display: flex;
@@ -558,7 +481,6 @@ h4 {
 	gap: 2vw;
 	height: auto;
 	min-height: 120px;
-	margin: 0 auto 32px auto;
 	border-radius: 22px;
 	position: relative;
 	min-width: 320px;
@@ -728,11 +650,6 @@ h4 {
 }
 
 /* Mejoras generales de color y armonía */
-.simulator-drawer {
-	background: linear-gradient(135deg, #e4e8eb 0%, #f5f7fa 100%);
-	border: 8px solid #3498db;
-	box-shadow: 0 12px 48px rgba(44, 62, 80, 0.13);
-}
 
 .computer-simulator {
 	background: var(--background-gradient);

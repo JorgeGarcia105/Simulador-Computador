@@ -141,6 +141,7 @@ function App() {
 								fontWeight: 'bold',
 								fontSize: '1.1em',
 								textAlign: 'center',
+								padding: '30px',
 							}}
 						>
 							Unidad de Control
