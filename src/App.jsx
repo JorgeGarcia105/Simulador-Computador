@@ -13,6 +13,7 @@ import { toBinary } from './utils/binaryUtils';
 import useInstructionCycle from './utils/useInstructionCycle.js';
 import { updateMemory } from './utils/MemoryHandler';
 import InternalBus from './components/CPU/InternalBus';
+import BusSystem from './components/BusSystem/BusSystem.jsx';
 const WORD_SIZE = 12;
 const ADDRESS_SIZE = 12;
 
@@ -25,6 +26,11 @@ function App() {
 		setSystemState,
 		handleOutput
 	);
+
+	// Extrae los 4 primeros bits del IR (opcode)
+	const controlSignal = systemState.cpu.registers.IR
+		? systemState.cpu.registers.IR.slice(0, 4)
+		: '0000';
 
 	// Manejadores de estado
 	const updateMemoryState = (address, value) => {
@@ -200,7 +206,7 @@ function App() {
 						clockCycles={systemState.buses.address.clockCycles}
 					/>
 					<ControlBus
-						value={systemState.buses.control.value}
+						value={controlSignal} // <-- aquí usas el opcode del IR
 						active={systemState.buses.control.active}
 						connection={systemState.buses.control.source}
 						clockCycles={systemState.buses.control.clockCycles}

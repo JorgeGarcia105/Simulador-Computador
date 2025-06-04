@@ -4,6 +4,7 @@ import DataBus from './DataBus';
 import AddressBus from './AddressBus';
 import ControlBus from './ControlBus';
 import './BusSystem.css';
+import registers from '../CPU/Registers';
 
 const BusSystem = ({ 
   dataBus = {}, 
@@ -18,6 +19,9 @@ const BusSystem = ({
     address: addressBus.active ? `${addressBus.source || 'cpu'} → memory` : null,
     control: controlBus.active ? `CPU → ${controlBus.currentOperation || 'operation'}` : null
   };
+
+  // Supón que tienes acceso a registers.IR
+  const controlSignal = registers.IR ? registers.IR.slice(0, 4) : '0000';
 
   return (
     <div className="bus-system">
@@ -83,10 +87,10 @@ const BusSystem = ({
           clockCycles={clockCycles}
         />
         <ControlBus 
-          value={controlBus.value || '0000'}
+          value={controlSignal}
           active={controlBus.active || false}
-          operation={controlBus.currentOperation}
-          connection={activeConnections.control}
+          source={controlBus.source || 'cpu'}
+          connection="CPU"
           clockCycles={clockCycles}
         />
       </div>

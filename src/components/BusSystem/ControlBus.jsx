@@ -9,6 +9,7 @@ const ControlBus = ({ value, active, connection, clockCycles }) => {
   };
 
   return (
+    
     <div className={`bus control-bus ${active ? 'active' : ''}`}>
       <h3>Bus de Control {connection && `(${connection})`}</h3>
       <div className="bus-value">

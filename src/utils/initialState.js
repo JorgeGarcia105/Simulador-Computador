@@ -24,7 +24,6 @@ export const initialState = {
         '0001000000000001', // LOAD 1
         '0011000000000011', // ADD 3
         '0010000000000100', // STORE 4 almacenamiento
-        '1111000000000000', // HLT  // Detener la ejecución
         // Instrucciones adicionales
         '0101000000000101', // SUB 5
         '0110000000000110', // MUL 6
