@@ -79,13 +79,15 @@ const InstructionSet = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{Object.entries(INSTRUCTION_SET).map(([opcode, { name, description }]) => (
-						<tr key={opcode}>
-							<td>{opcode}</td>
-							<td>{name}</td>
-							<td>{description}</td>
-						</tr>
-					))}
+					{Object.entries(INSTRUCTION_SET)
+    .sort(([a], [b]) => parseInt(a, 2) - parseInt(b, 2)) // Ordena por valor binario ascendente
+    .map(([opcode, { name, description }]) => (
+      <tr key={opcode}>
+        <td>{opcode}</td>
+        <td>{name}</td>
+        <td>{description}</td>
+      </tr>
+    ))}
 				</tbody>
 			</table>
 		</div>
