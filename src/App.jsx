@@ -113,9 +113,9 @@ function App() {
 	return (
 		<div className="simulator-drawer">
 			<div className="computer-simulator">
-				<h1 className="simulator-title">Simulador de Arquitectura de Computadora</h1>
+				<div className="simulator-title">
+					<h1 className="simulator-titulo">Simulador de Arquitectura de Computadora</h1>
 
-				<div className="control-panel">
 					<div className="control-buttons">
 						<button onClick={executeNextInstruction}>Paso a Paso</button>
 						<button
@@ -147,6 +147,7 @@ function App() {
 								fontWeight: 'bold',
 								fontSize: '1.1em',
 								textAlign: 'center',
+								padding: '30px',
 							}}
 						>
 							Unidad de Control
