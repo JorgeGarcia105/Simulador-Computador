@@ -86,6 +86,13 @@ export const binarySubtract = (a, b, wordSize = WORD_SIZE) => {
   // Resta mediante suma del complemento a 2
   const negB = binaryNegate(b, wordSize);
   const { result, flags } = binaryAdd(a, negB, wordSize);
+
+  // Recalcula la flag C para resta (borrow)
+  // Carry = 1 si a >= b, Carry = 0 si a < b
+  const aDec = parseInt(a, 2);
+  const bDec = parseInt(b, 2);
+  flags.C = aDec < bDec ? '1' : '0';
+
   return { result, flags };
 };
 

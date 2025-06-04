@@ -1,22 +1,70 @@
 export const INSTRUCTION_SET = {
-	'0000': { name: 'NOP', description: 'No operation' },
-	'0001': { name: 'LOAD', description: 'Load from memory to ACC' },
-	'0010': { name: 'STORE', description: 'Store ACC to memory' },
-	'0011': { name: 'ADD', description: 'Add memory to ACC' },
-	'0100': { name: 'SUB', description: 'Subtract memory from ACC' },
-	'0101': { name: 'JMP', description: 'Jump to address' },
-	'0110': { name: 'JZ', description: 'Jump if zero' },
-	'0111': { name: 'JC', description: 'Jump if carry' },
-	1000: { name: 'OUT', description: 'Output ACC' },
-	1001: { name: 'IN', description: 'Input to ACC' },
-	1010: { name: 'AND', description: 'Logical AND with ACC' },
-	1011: { name: 'OR', description: 'Logical OR with ACC' },
-	1100: { name: 'XOR', description: 'Logical XOR with ACC' },
-	1101: { name: 'NOT', description: 'Logical NOT of ACC' },
-	1110: { name: 'SHL', description: 'Shift ACC left' },
-	1111: { name: 'SHR', description: 'Shift ACC right' },
-	// ...otros si los tienes
+  '0000': {
+    name: 'NOP',
+    description: 'No realiza ninguna operación. Es útil para introducir retardos o alineación de instrucciones.'
+  },
+  '0001': {
+    name: 'LOAD',
+    description: 'Carga en el acumulador (ACC) el valor contenido en la dirección de memoria especificada.'
+  },
+  '0010': {
+    name: 'STORE',
+    description: 'Almacena el contenido del acumulador (ACC) en la dirección de memoria especificada.'
+  },
+  '0011': {
+    name: 'ADD',
+    description: 'Suma al contenido del acumulador (ACC) el valor de la dirección de memoria especificada.'
+  },
+  '0100': {
+    name: 'SUB',
+    description: 'Resta al acumulador (ACC) el valor que se encuentra en la dirección de memoria especificada.'
+  },
+  '0101': {
+    name: 'JMP',
+    description: 'Salta a la instrucción ubicada en la dirección especificada, sin condición. Modifica directamente el contador de programa (PC).'
+  },
+  '0110': {
+    name: 'JZ',
+    description: 'Salta a la dirección especificada si el resultado anterior fue cero (Z=1 en el registro de banderas).'
+  },
+  '0111': {
+    name: 'JC',
+    description: 'Salta a la dirección especificada si la operación anterior generó un acarreo (C=1 en el registro de banderas).'
+  },
+  '1000': {
+    name: 'OUT',
+    description: 'Envía el contenido actual del acumulador (ACC) hacia el dispositivo de salida (por ejemplo, consola o pantalla).'
+  },
+  '1001': {
+    name: 'IN',
+    description: 'Lee un valor desde el dispositivo de entrada y lo almacena en el acumulador (ACC).'
+  },
+  '1010': {
+    name: 'AND',
+    description: 'Realiza una operación lógica AND entre el contenido del acumulador (ACC) y un valor de memoria.'
+  },
+  '1011': {
+    name: 'OR',
+    description: 'Realiza una operación lógica OR entre el contenido del acumulador (ACC) y un valor de memoria.'
+  },
+  '1100': {
+    name: 'XOR',
+    description: 'Realiza una operación lógica XOR entre el acumulador (ACC) y un valor de memoria.'
+  },
+  '1101': {
+    name: 'NOT',
+    description: 'Invierte (niega) todos los bits del acumulador (ACC). Operación unaria.'
+  },
+  '1110': {
+    name: 'SHL',
+    description: 'Desplaza a la izquierda los bits del acumulador (ACC) una posición. Equivale a una multiplicación por 2.'
+  },
+  '1111': {
+    name: 'SHR',
+    description: 'Desplaza a la derecha los bits del acumulador (ACC) una posición. Equivale a una división por 2 sin signo.'
+  }
 };
+
 
 const InstructionSet = () => {
 	return (

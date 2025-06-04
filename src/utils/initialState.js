@@ -1,6 +1,23 @@
 import { toBinary, ADDRESS_SIZE, WORD_SIZE } from './binaryUtils';
 import InstructionSet from '../components/InstructionSet';
 
+const RAM_SIZE = 4096; // 12 bits de dirección
+
+// Tus datos iniciales (primeras posiciones)
+const initialData = [
+  '000000000011', // RAM[0] = 3
+  '000000000101', // RAM[1] = 5
+  '000000000010', // RAM[2] = 2
+  '000000000111', // RAM[3] = 7
+  '000000000001', // RAM[4] = 1
+  // ...más datos si quieres
+];
+
+// Rellena la RAM con ceros y pon los datos y el código en su lugar
+const ram = Array(RAM_SIZE).fill('000000000000');
+initialData.forEach((val, i) => ram[i] = val);
+initialData.forEach((val, i) => ram[0x800 + i] = val);
+
 export const initialState = {
   cpu: {
     registers: {
@@ -18,24 +35,27 @@ export const initialState = {
     },
   },
   memory: {
-    ram: JSON.parse(localStorage.getItem('simulator_ram_data')) || Array(256).fill('00000000'),
+    ram,
     rom: [
         '0001000000000010', // LOAD 2
         '0001000000000001', // LOAD 1
         '0011000000000011', // ADD 3
-        '0010000000000100', // STORE 4 almacenamiento
-        // Instrucciones adicionales
-        '0101000000000101', // SUB 5
-        '0110000000000110', // MUL 6
+        '0010000000000100', // STORE 4
+
+        '0100000000000101', // SUB 5
+        '0010000000001110', // STORE 14
+        '0011000000000110', // ADD 6
         '0011000000000111', // ADD 7
+
         '0001000000001000', // LOAD 8
-        '1100000000001001', // JMP 9
-        '1110000000001010', // JZ 10
-        '1011000000001011', // AND 11
-        '1010000000001100', // OR 12
-        '1001000000001101', // XOR 13
-        '1111111111111111', // NOP (No Operation)
-        '1000000000001110', // MOV 14
+        '0101000000001001', // JMP 9
+        '0110000000001010', // JZ 10
+        '1010000000001011', // AND 11
+        '1011000000001100', // OR 12
+        '1100000000001101', // XOR 13
+
+        '0000000000000000', // NOP
+        '1000000000001110'  // OUT 14
     ]
   },
   instructionSet: InstructionSet,

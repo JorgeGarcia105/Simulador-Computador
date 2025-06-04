@@ -144,21 +144,6 @@ Valor (dec): ${parseInt(value, 2)}`}
         </div>
       </div>
 
-      {/* Segmento de CÓDIGO */}
-      <div className="memory-segment">
-        <h4>Segmento de Programa (0x800 - 0xFFF)</h4>
-        <div className="ram-grid">
-          {codeMemory.slice(0, 16).map((value, index) => (
-            <MemoryCell 
-              key={index}
-              address={CODE_SEGMENT_START + index}
-              value={value}
-              isCode={true}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Vista Binaria Continua del Programa - VERSIÓN CORREGIDA */}
       <div className="binary-program-view">
         <h4>Programa en Binario Continuo (0x800-0xFFF)</h4>
